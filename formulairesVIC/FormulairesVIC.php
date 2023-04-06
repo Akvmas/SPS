@@ -196,7 +196,6 @@
                         <label for="Autres documents" class="formbold-form-label"> Autres documents</label>
                         <input  type = "text"  id ="Autres documents"  name="Autres documents" class="formbold-form-input"/>
                     </div>
-                    <br>
                     <br><strong>installations de chantier</strong>
                     <br><br>
                     <div class="w-full sm:w-half formbold-px-3">
