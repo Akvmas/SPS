@@ -62,7 +62,16 @@
                                     </div>
                                     <div class="w-full sm:w-half formbold-px-3">
                                         <div class="formbold-mb-5">
-                                        <h1 class="formbold-form-label"><strong>Fiche D'inspection commune </h1></strong>
+                                        <h1><strong>Fiche D'inspection commune </h1></strong>
+                                    </div>
+                                    <div id="current_date"></p>
+                                    <script>
+                                    date = new Date();
+                                    year = date.getFullYear();
+                                    month = date.getMonth() + 1;
+                                    day = date.getDate();
+                                    document.getElementById("current_date").innerHTML = day + "/" +month + "/" + year;
+                                    </script>
                                     </div>
                                 </div>
                             </header>
