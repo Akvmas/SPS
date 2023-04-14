@@ -109,6 +109,10 @@
                     <br>
                     <div class="formbold-mb-5">
                         <label for="Titulaire :" class="formbold-form-label">Titulaire :</label>
+                        <input type="text"name="Sous-Traitant de"id="Sous-Traitant de"class="formbold-form-input"/>
+                    </div>
+                    <div class="formbold-mb-5">
+                        <label for="Sous-Traitant de" class="formbold-form-label">Sous-Traitant de :</label>
                         <select id = "Titulaire" name="Titulaire"  class="formbold-form-input">
                         <?php
                         $reponse = $bdd->query('SELECT * FROM entreprise ORDER BY Nom');
@@ -120,10 +124,6 @@
                             }
                         ?>
                         </select>
-                    </div>
-                    <div class="formbold-mb-5">
-                        <label for="Sous-Traitant de" class="formbold-form-label">Sous-Traitant de :</label>
-                        <input type="text"name="Sous-Traitant de"id="Sous-Traitant de"class="formbold-form-input"/>
                     </div>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
