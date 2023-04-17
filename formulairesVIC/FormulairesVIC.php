@@ -443,7 +443,7 @@
                         <label for="ISDD" class="formbold-form-label">Interventions susceptibles d’être dangereuses :</label>
                         <select id = "ISDD" name="ISDD" class="formbold-form-input" multiple multiselect-select-all="true">
                         <?php
-                            $reponse = $bdd->query('SELECT * FROM protections ORDER BY Nom');
+                            $reponse = $bdd->query('SELECT * FROM Interventions ORDER BY Nom');
                             while ($donnees = $reponse->fetch())
                             {
                                 ?>
@@ -479,14 +479,50 @@
                             <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
                         </div>
                     </div>
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <canvas id="sig-canvas" width="620" height="100">
-                                </canvas>
+                    <fieldset class="flex flex-wrap formbold--mx-3">
+                        <br><h3>Visite du site faite ce jour pour analyse des conditions d’exécution des travaux</h3>
+                        <div class="flex flex-wrap formbold--mx-3">
+                            <div class="w-full sm:w-half formbold-px-3">
+                                <div class="formbold-mb-5 w-full">
+                                <br>coordonnateur S.P.S<br>
+                                    Nom        <input type="text" name="Nom" id="Nom"/><br>
+                                    Date :     <labale for ="Date" id="current_date2"/>
+                                    <script>
+                                    date = new Date();
+                                    year = date.getFullYear();
+                                    month = date.getMonth() + 1;
+                                    day = date.getDate();
+                                    document.getElementById("current_date2").innerHTML = day + "/" +month + "/" + year;
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="w-full sm:w-half formbold-px-3">
+                                <div class="formbold-mb-5">
+                                <br>L’entreprise
+                                    <br>
+                                    Nom        <input type="text" name="Nom" id="Nom"/><br>
+                                    Date :     <labale for ="Date" id="current_date3"/>
+                                    <script>
+                                    date = new Date();
+                                    year = date.getFullYear();
+                                    month = date.getMonth() + 1;
+                                    day = date.getDate();
+                                    document.getElementById("current_date3").innerHTML = day + "/" +month + "/" + year;
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <canvas id="sig-canvas" width="545" height="100">
+                                        </canvas>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </fieldset>
+                </div>
+            </div>
         </form>
         <script src="multiselect-dropdown.js" ></script>
     </body>
