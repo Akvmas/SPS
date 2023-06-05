@@ -16,7 +16,7 @@
         <link rel = "stylesheet" href = "style.css">
         <script src="html2pdf.bundle.min.js"></script>
         <script src="affichage.js"></script>
-        <script src="signature.js"></script>
+        <script src = "signature.js"></script>
     </head>
     <button id = "pdf" value="Click"> download PDF </button>
     <script type="text/javascript">
@@ -48,7 +48,7 @@
             die('Erreur : '.$e->getMessage());
         }
         ?>
-        <form>
+        <form method="POST" action="">
             <div class="formbold-main-wrapper">
                 <div class="formbold-form-wrapper">
                     <div class="formbold-mb-5">
@@ -397,37 +397,38 @@
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5 w-full">
-                                <label for="Enterrés" class="formbold-form-label">Enterrés :</label>
-                                <input type="text" name="Enterrés" id="Enterrés" class="formbold-form-input"/>
+                                <label for="enterres" class="formbold-form-label">Réseaux Entérrées</label>
+                                <select id = "enterres" name="enterres" class="formbold-form-input" multiple multiselect-select-all="true">
+                                    <?php
+                                    $reponse = $bdd->query('SELECT * FROM reseauxenterres ORDER BY nom');
+                                    while ($donnees = $reponse->fetch())
+                                    {
+                                        ?>
+                                        <option value="<?php echo $donnees['nom']; ?>"> <?php echo $donnees['nom']; ?></option>
+                                        <?php
+                                        }
+                                        ?>
+                                </select>
                             </div>
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5 w-full">
-                                <label for="Aériens" class="formbold-form-label">Aériens :</label>
-                                <input type="text" name="Aériens" id="Aériens" class="formbold-form-input"/>
+                                <label for="enterres" class="formbold-form-label">Réseaux Aériens</label>
+                                <select id = "Aeriens" name="Aeriens" class="formbold-form-input" multiple multiselect-select-all="true">
+                                    <?php
+                                    $reponse = $bdd->query('SELECT * FROM reseauxAeriens ORDER BY nom');
+                                    while ($donnees = $reponse->fetch())
+                                    {
+                                        ?>
+                                        <option value="<?php echo $donnees['nom']; ?>"> <?php echo $donnees['nom']; ?></option>
+                                        <?php
+                                        }
+                                        ?>
+                                </select>
                             </div>
                         </div>
                     </div>
-                    <br>
-                    <br> <h3><strong>Type de réseaux</strong></h3> </br>
-                    <br>
-                    <div class="flex flex-wrap formbold--mx-3">
-                        <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5">
-                                GDF        <input type="checkbox" name="GDF" id="GDF"/>
-                            </div>
-                        </div>
-                        <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5">
-                                EDF        <input type="checkbox" name="EDF" id="EDF"/>
-                            </div>
-                        </div>
-                        <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5">
-                                EAU        <input type="checkbox" name="EAU" id="EAU"/>
-                            </div>
-                        </div>
-                    </div>
+
                     <br>
                     <br> <h3><strong>Risques</strong></h3> </br>
                     <br>
@@ -484,7 +485,7 @@
                         <div class="flex flex-wrap formbold--mx-3">
                             <div class="w-full sm:w-half formbold-px-3">
                                 <div class="formbold-mb-5 w-full">
-                                <br>coordonnateur S.P.S<br>
+                                <br>Entreprise<br>
                                     Nom        <input type="text" name="Nom" id="Nom"/><br>
                                     Date :     <labale for ="Date" id="current_date2"/>
                                     <script>
@@ -498,7 +499,7 @@
                             </div>
                             <div class="w-full sm:w-half formbold-px-3">
                                 <div class="formbold-mb-5">
-                                <br>L’entreprise
+                                <br>coordonnateur S.P.S
                                     <br>
                                     Nom        <input type="text" name="Nom" id="Nom"/><br>
                                     Date :     <labale for ="Date" id="current_date3"/>
@@ -514,8 +515,14 @@
                             <div class="container">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <canvas id="sig-canvas" width="545" height="100">
+                                        <canvas id="sig-canvas" width="220" height="100">
                                         </canvas>
+                                        <img src="../images/signature.png" width="220" height="100" >
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -525,5 +532,6 @@
             </div>
         </form>
         <script src="multiselect-dropdown.js" ></script>
+        <script src = "signature.js"></script>
     </body>
 </html>
