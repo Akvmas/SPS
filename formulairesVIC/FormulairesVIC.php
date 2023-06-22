@@ -158,7 +158,7 @@
                         </div>
                     </div>
                     <br>
-                    <strong><h3>Document préparatoire</h3></strong>
+                    <strong>Document préparatoire</strong>
                     <br>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
@@ -188,7 +188,7 @@
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5 w-full">
-                                MOA     <input type="checkbox" name="MOA" id="MOA"/>
+                                MOA (SS4)     <input type="checkbox" name="MOA" id="MOA"/>
                             </div>
                         </div>
                     </div>
@@ -196,7 +196,7 @@
                         <label for="Autres documents" class="formbold-form-label"> Autres documents</label>
                         <input  type = "text"  id ="Autres documents"  name="Autres documents" class="formbold-form-input"/>
                     </div>
-                    <br><strong>installations de chantier</strong>
+                    <br><strong>Installations de chantier</strong>
                     <br><br>
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5 w-full">
@@ -280,24 +280,33 @@
                         <label for="Conditions et mode d’approvisionnement" class="formbold-form-label">Conditions et mode d’approvisionnement :</label>
                         <input type="text"name="Conditions et mode d’approvisionnement"id="Conditions et mode d’approvisionnement"class="formbold-form-input"/>
                     </div>
-                    <div class="formbold-mb-5">
-                        <label for="Survol de grue" class="formbold-form-label">Survol de grue :</label>
-                        <select class="formbold-form-input" aria-label=".form-select-sm" id = "Survol de grue" name="Survol de grue">
-                            <option value = "1">Grue fixe</option>
-                            <option value = "2">Grue mobile </option>
-                        </select>
+                    <div class="w-full sm:w-half formbold-px-3">
+                        <div class="formbold-mb-5 w-full">
+                            <label for="Survol de grue" class="formbold-form-label">Survol de grue :</label>
+                            <select class="formbold-form-input" aria-label=".form-select-sm" id = "Survol de grue" name="Survol de grue">
+                                <option value ="1"></option>    
+                                <option value = "2">Grue fixe</option>
+                                <option value = "3">Grue mobile </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="w-full sm:w-half formbold-px-3">
+                        <div class="formbold-mb-5 w-full">
+                             <label for="Contrôle" class="formbold-form-label">Contrôle :</label>
+                            <input type="text" name="Contrôle" id="Contrôle" class="formbold-form-input"/>
+                        </div>
                     </div>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5 w-full">
-                                <label for="Contrôle" class="formbold-form-label">Contrôle :</label>
-                                <input type="text" name="Contrôle" id="Contrôle" class="formbold-form-input"/>
+                            <div class="formbold-mb-5">
+                                <label for="Secouristes" class="formbold-form-label">Secouristes :</label>
+                                <input type="text" name="Secouristes" id="Secouristes" class="formbold-form-input"/>
                             </div>
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5 w-full">
-                                <label for="Secouristes" class="formbold-form-label">Secouristes :</label>
-                                <input type="text" name="Secouristes" id="Secouristes" class="formbold-form-input"/>
+                            <div class="formbold-mb-5">
+                                <label for="Moyens d’alerte" class="formbold-form-label">Moyens d’alerte :</label>
+                                <input type="text" name="Moyens d’alerte" id="Moyens d’alerte" class="formbold-form-input"/>
                             </div>
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
@@ -311,15 +320,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="formbold-mb-5">
-                        <label for="Moyens d’alerte" class="formbold-form-label">Moyens d’alerte :</label>
-                        <input type="text" name="Moyens d’alerte" id="Moyens d’alerte" class="formbold-form-input"/>
-                    </div>
                     </div>
                     <br>
                     <br><h3>Environnement</h3></br>
                     <br>
-                    <div class="flex flex-wrap formbold--mx-3">
+                    <div class="flex flex-wrap formbold--mx-3"> 
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5 w-full">
                                 Bruit       <input type="checkbox" name="Bruit" id="Bruit"/>
@@ -345,9 +350,26 @@
                                 Electrisation       <input type="checkbox" name="Electrisation" id="Electrisation"/>
                             </div>
                         </div>
+                        <div class="w-full sm:w-half formbold-px-3">
+                            <div class="formbold-mb-5 w-full">
+                                Espaces Confinés      <input type="checkbox" name="EC" id="EC"/>
+                            </div>
+                        </div>
+                        <div class="formbold-mb-5 w-full">
+                            <label for="Circulation" class="formbold-form-label">Circulation :</label>
+                            <input type="text" name="Circulation" id="Circulation" class="formbold-form-input"/>
+                        </div>
+                        <div class="formbold-mb-5 w-full">
+                            <label for="Manœuvre d’engin" class="formbold-form-label">Manœuvre d’engin :</label>
+                            <input type="text" name="Manœuvre d’engin" id="Manœuvre d’engin" class="formbold-form-input"/>
+                        </div>
+                        <div class="formbold-mb-5 w-full">
+                            <label for="Protections à installer" class="formbold-form-label">Protections à installer :</label>
+                            <input type="text" name="Protections à installer" id="Protections à installer" class="formbold-form-input"/>
+                        </div>
                     </div>
                     <br>
-                    <br><h3>Déblai</h3></br>
+                    <br>Déblais :</br>
                     <br>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
@@ -360,39 +382,17 @@
                                 Stockage        <input type="checkbox" name="Stockage" id="Stockage"/>
                             </div>
                         </div>
-                        <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5">
-                                <label for="Tri des déchets" class="formbold-form-label">Tri des déchets :</label>
-                                <input type="text" name="Tri des déchets" id="Tri des déchets" class="formbold-form-input"/>
-                            </div>
+                        <div class="formbold-mb-5 w-full">
+                            <label for="Tri des déchets" class="formbold-form-label">Tri des déchets :</label>
+                            <input type="text" name="Tri des déchets" id="Tri des déchets" class="formbold-form-input"/>
                         </div>
-                        <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5 w-full">
-                                <label for="Manœuvre d’engin" class="formbold-form-label">Manœuvre d’engin :</label>
-                                <input type="text" name="Manœuvre d’engin" id="Manœuvre d’engin" class="formbold-form-input"/>
-                            </div>
-                        </div>
-                        <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5 w-full">
-                                <label for="Protections à installer" class="formbold-form-label">Protections à installer :</label>
-                                <input type="text" name="Protections à installer" id="Protections à installer" class="formbold-form-input"/>
-                            </div>
-                        </div>
-                        <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5 w-full">
-                                <label for="Circulation" class="formbold-form-label">Circulation :</label>
-                                <input type="text" name="Circulation" id="Circulation" class="formbold-form-input"/>
-                            </div>
-                        </div>
-                        <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5 w-full">
-                                <label for="Autres" class="formbold-form-label">Autres :</label>
-                                <input type="text" name="Autres" id="Autres" class="formbold-form-input"/>
-                            </div>
+                        <div class="formbold-mb-5 w-full">
+                            <label for="Autres" class="formbold-form-label">Autres :</label>
+                            <input type="text" name="Autres" id="Autres" class="formbold-form-input"/>
                         </div>
                     </div>
                     <br>
-                    <br> <strong><h3>Réseaux</h3></strong> </br>
+                    <br>Réseaux :</br>
                     <br>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
@@ -454,11 +454,9 @@
                                 ?>
                         </select>
                     </div>
-                    <div class="w-full sm:w-half formbold-px-3">
-                        <div class="formbold-mb-5">
-                            <label for="AutresChantier" class="formbold-form-label">Autres* :</label>
-                            <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
-                        </div>
+                    <div class="formbold-mb-5">
+                        <label for="AutresChantier" class="formbold-form-label">Autres* :</label>
+                        <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
                     </div>
                     <div class="formbold-mb-5">
                         <label for="PAI" class="formbold-form-label">Protections à installer :</label>
@@ -474,11 +472,9 @@
                                 ?>
                         </select>
                     </div>
-                    <div class="w-full sm:w-half formbold-px-3">
-                        <div class="formbold-mb-5">
-                            <label for="AutresChantier" class="formbold-form-label">Autres* :</label>
-                            <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
-                        </div>
+                    <div class="formbold-mb-5">
+                        <label for="AutresChantier" class="formbold-form-label">Autres* :</label>
+                        <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
                     </div>
                     <fieldset class="flex flex-wrap formbold--mx-3">
                         <br><h3>Visite du site faite ce jour pour analyse des conditions d’exécution des travaux</h3>
@@ -501,7 +497,7 @@
                                 <div class="formbold-mb-5">
                                 <br>coordonnateur S.P.S
                                     <br>
-                                    Nom        <input type="text" name="Nom" id="Nom"/><br>
+                                    Nom        <input type="text" name="Nom" id="Nom" value="MONGARS Gaël"/><br>
                                     Date :     <labale for ="Date" id="current_date3"/>
                                     <script>
                                     date = new Date();

@@ -19,9 +19,9 @@
       $password = stripslashes($_REQUEST['password']);
       $password = mysqli_real_escape_string($conn, $password);
       $query = "SELECT * FROM `user` WHERE username='$username' and password='".hash('sha256', $password)."'";
-      
+      print_r($query);
       $result = mysqli_query($conn,$query) or die(mysqli_error($conn));
-      
+      print_r($result);
       if (mysqli_num_rows($result) == 1) {
         $user = mysqli_fetch_assoc($result);
         // vérifier si l'utilisateur est un administrateur ou un utilisateur
