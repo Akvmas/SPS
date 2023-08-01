@@ -7,31 +7,36 @@
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/style.css">
-	</head>
+  </head>
   <body class="img js-fullheight" style="background-image: url(images/bg.jpeg);">
     <?php
-    require('config.php');
+    include('config.php');
     session_start();
     if (isset($_POST['username'])){
       $username = stripslashes($_REQUEST['username']);
-      $username = mysqli_real_escape_string($conn, $username);
       $_SESSION['username'] = $username;
       $password = stripslashes($_REQUEST['password']);
-      $password = mysqli_real_escape_string($conn, $password);
-      $query = "SELECT * FROM `user` WHERE username='$username' and password='".hash('sha256', $password)."'";
-      
-      $result = mysqli_query($conn,$query) or die(mysqli_error($conn));
-      
-      if (mysqli_num_rows($result) == 1) {
-        $user = mysqli_fetch_assoc($result);
-        // vérifier si l'utilisateur est un administrateur ou un utilisateur
-        if ($user['type'] == 'admin') {
-          header('location: admin/home.php');      
-        }else{
-          header('location: index.php');
+      $password_hash = hash('sha256', $password);
+      try {
+        $conn = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $stmt = $conn->prepare('SELECT * FROM `user` WHERE username=:username AND password=:password');
+        $stmt->execute(array(':username' => $username, ':password' => $password_hash));
+
+        if ($stmt->rowCount() == 1) {
+          $user = $stmt->fetch(PDO::FETCH_ASSOC);
+          // vérifier si l'utilisateur est un administrateur ou un utilisateur
+          if ($user['type'] == 'admin') {
+            header('location: admin/home.php');      
+          } else {
+            header('location: index.php');
+          }
+        } else {
+          $message = "Le nom d'utilisateur ou le mot de passe est incorrect.";
         }
-      }else{
-        $message = "Le nom d'utilisateur ou le mot de passe est incorrect.";
+      } catch(PDOException $e) {
+        echo "Erreur : " . $e->getMessage();
       }
     }
     ?>

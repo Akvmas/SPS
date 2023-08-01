@@ -21,7 +21,7 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-md-6 text-center mb-5">
-            <h1>Bienvenue <?php echo 'Gaël'; ?>!</h1>
+            <h1>Bienvenue <?php echo $_SESSION["username"]; ?>!</h1>
             <p>C'est votre espace utilisateur.</p>
           </div>
         </div>
@@ -30,7 +30,10 @@
             <button name="Formulaires VIC" class = "form-control btn btn-primary submit px-3" id = FormulaireVIC value="Formulaire" onclick="self.location.href='formulairesVIC/FormulairesVIC.php'">Visite d'inspection commune</button>
             <br>
             </br>
-            <button name="Formulaires FON" class = "form-control btn btn-primary submit px-3" id = "FormulaireFON"value="Formulaire" onclick="self.location.href='Formulaires.html'">Fiche d'observation ou de notification</button>
+            <button name="Formulaires FON" class = "form-control btn btn-primary submit px-3" id = "FormulaireFON"value="Formulaire" onclick="self.location.href='FormulairesFON/FormulaireFON.php'">Fiche d'observation ou de notification</button>
+            <br>
+            </br>
+            <button name="Formulaires FON" class = "form-control btn btn-primary submit px-3" id = "FormulaireFON"value="Formulaire" onclick="self.location.href='consultation/RechercheFon.php'">Recherche de Fiche d'observation ou de notification</button>
           </div>
           <div class="container">
             <div class="login-wrap p-0">
