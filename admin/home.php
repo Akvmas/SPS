@@ -18,37 +18,40 @@
     </head>
     <body class="img js-fullheight" style="background-image: url(../images/bg.jpeg);">
     <section class="ftco-section">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 text-center mb-5">
-                            <h2 class="heading-section">Bienvenue</h2>
-                        </div>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 col-lg-3">
-                            <div class="login-wrap p-0">
-                              <div class = "form-group">
-                                <a href="add_user.php">Add user</a> |
-                                <a href="update_user.php">Update user</a> |
-                                <a href="delete_user.php">Delete user</a> 
-                              </div>
-                              <div class ="row justify-content-center">
-                                  <a href="../logout.php">Déconnexion</a>
-                                  <br>
-                                  </br>
-                              </div>
-                                <div class="login-wrap p-0">
-                                  <div class="form-group">
-                                    <button name="Formulaires VIC" class = "form-control btn btn-primary submit px-3" id = FormulaireVIC value="Formulaire" onclick="self.location.href='../formulairesVIC/FormulairesVIC.php'">Formulaire VIC </button>
-                                    <br>
-                                    </br>
-                                    <button name="Formulaires FON" class = "form-control btn btn-primary submit px-3" id = "FormulaireFON"value="Formulaire" onclick="self.location.href='Formulaires.html'">Formulaire FON</button>
-                                  </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6 text-center mb-5">
+            <h2 class="heading-section">Bienvenue</h2>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-md-6 col-lg-3">
+            <div class="login-wrap p-0">
+              <div class = "form-group">
+                <a href="add_user.php">Add user</a> |
+                <a href="update_user.php">Update user</a> |
+                <a href="delete_user.php">Delete user</a> 
+              </div>
+              <div class ="row justify-content-center">
+                  <a href="../logout.php">Déconnexion</a>
+                  <br>
+                  </br>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="login-wrap p-0">
+          <div class="form-group">
+            <button name="Formulaires VIC" class = "form-control btn btn-primary submit px-3" id = FormulaireVIC value="Formulaire" onclick="self.location.href='../formulairesVIC/FormulairesVIC.php'">Formulaire VIC </button>
+            <br>
+            </br>
+            <button name="Formulaires FON" class = "form-control btn btn-primary submit px-3" id = "FormulaireFON"value="Formulaire" onclick="self.location.href='../FormulairesFON/FormulaireFON.php'">Formulaire FON</button>
+            <br>
+            </br>
+            <button name="Formulaires FON" class = "form-control btn btn-primary submit" id = "FormulaireFON"value="Formulaire" onclick="self.location.href='../consultation/RechercheFon.php'">Recherche Formulaire FON</button>
+          </div>
+        </div>
+      </div>
     </section>
     <script src='../js/jquery.min.js'></script>
     <script src='../js/popper.js'></script>

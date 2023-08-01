@@ -1,0 +1,142 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.part-one, .part-two, .part-three {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.part-three {
+  display: flex;
+  justify-content: space-between;
+}
+.radio-buttons label {
+  font-weight: normal;
+}
+.column1 {
+  border-right: 1px solid #000; /* Cela ajoute une bordure de 1px de largeur, solide et de couleur noire sur le côté droit de la div */
+  padding-right: 20px; /* Cela ajoute un peu d'espace entre le texte et la ligne verticale */
+}
+
+.column2 {
+  padding-left: 20px; /* Cela ajoute un peu d'espace entre le texte et la ligne verticale */
+}
+
+.column1,
+.column2 {
+  flex: 1;
+  margin-right: 15px; /* Add some margin if you want some space between the columns */
+}
+
+h2 {
+  text-align: center;
+}
+
+form {
+  margin-top: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+textarea, input[type="text"], input[type="date"], input[type="time"], input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  
+}
+
+input[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-link {
+  background-color: #f1f1f1;
+  color: #333;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tab-link.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+@media only screen and (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+
+  textarea, input[type="text"], input[type="date"], input[type="time"], input[type="file"] {
+    margin-bottom: 10px;
+  }
+}
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.input-group label {
+  margin-right: 10px;
+}
+
+.input-group input[type="text"],
+.input-group textarea,
+.input-group select {
+  flex: 1;
+}
+
+.text-divider {
+  width: 100%;
+  border-bottom: 1px solid #ccc;
+  margin: 20px 0;
+}    
+
+
+
+
+
