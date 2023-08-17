@@ -2,7 +2,7 @@
 <?php
   // Initialiser la session
   session_start();
-  // VÃ©rifiez si l'utilisateur est connectÃ©, sinon redirigez-le vers la page de connexion
+  // Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
   if(!isset($_SESSION["username"])){
     header("Location: login.php");
     exit(); 
@@ -20,27 +20,27 @@
         <?php
         require('../config.php');
         if (isset($_REQUEST['username'],$_REQUEST['type'], $_REQUEST['password'])){
-            // rÃ©cupÃ©rer le nom d'utilisateur 
+            // récupérer le nom d'utilisateur 
             $username = stripslashes($_REQUEST['username']);
-            $username = mysqli_real_escape_string($conn, $username); 
-            // rÃ©cupÃ©rer le mot de passe 
+            // récupérer le mot de passe 
             $password = stripslashes($_REQUEST['password']);
-            $password = mysqli_real_escape_string($conn, $password);
-            // rÃ©cupÃ©rer le type (user | admin)
+            // récupérer le type (user | admin)
             $type = stripslashes($_REQUEST['type']);
-            $type = mysqli_real_escape_string($conn, $type);
-            $query = "UPDATE `user` SET `type` = '$type', password=SHA2('$password',256) WHERE `username` = '$username'";
-            $res = mysqli_query($conn, $query);
-            if($res){
+            $stmt = $pdo->prepare("UPDATE `user` SET `type` = :type, password=SHA2(:password,256) WHERE `username` = :username");
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->bindParam(':password', $password, PDO::PARAM_STR);
+            $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+            $stmt->execute();
+            if($stmt->rowCount()){
                 echo "
                 <body class='img js-fullheight' style='background-image: url(../images/bg.jpeg);'>
                 <div class='ftco-section'>
                 <div class='container'>
                 <div class='row justify-content-center'>
                 <div class='col-md-6 text-center mb-5'>                
-                <h3 class='heading-section'>L'utilisateur a Ã©tÃ© mis Ã  jour avec succÃ©s.</h3>
+                <h3 class='heading-section'>L'utilisateur a été mis à jour avec succès.</h3>
                 <div class='form-group'>
-                <p>Cliquez <a href='home.php'>ici</a> pour retourner Ã  la page d'accueil</p>
+                <p>Cliquez <a href='home.php'>ici</a> pour retourner à la page d'accueil</p>
                 <script src='../js/jquery.min.js'></script>
                 <script src='../js/popper.js'></script>
                 <script src='../js/bootstrap.min.js'></script>

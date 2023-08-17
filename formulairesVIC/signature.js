@@ -132,3 +132,12 @@
   }, false);
 
 })();
+  window.onload = function() {
+    var signButton = document.getElementById('signer-button');
+    var popupDiv = document.getElementById('popup');
+
+    signButton.onclick = function() {
+      popupDiv.style.display = 'block';
+    };
+  };
+

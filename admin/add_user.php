@@ -2,7 +2,7 @@
 <?php
   // Initialiser la session
   session_start();
-  // VÃ©rifiez si l'utilisateur est connectÃ©, sinon redirigez-le vers la page de connexion
+  // Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
   if(!isset($_SESSION["username"])){
     header("Location: login.php");
     exit(); 
@@ -17,21 +17,19 @@
         <link rel="stylesheet" href="../css/style.css">
     </head>
     <body class="img js-fullheight" style="background-image: url(../images/bg.jpeg);">
-        <?php
+    <?php
         require('../config.php');
         if (isset($_REQUEST['username'],$_REQUEST['type'], $_REQUEST['password'])){
-            // rÃ©cupÃ©rer le nom d'utilisateur 
+            // récupérer le nom d'utilisateur et supprime les antislashes
             $username = stripslashes($_REQUEST['username']);
-            $username = mysqli_real_escape_string($conn, $username); 
-            // rÃ©cupÃ©rer le mot de passe 
+            // récupérer le mot de passe et supprime les antislashes
             $password = stripslashes($_REQUEST['password']);
-            $password = mysqli_real_escape_string($conn, $password);
-            // rÃ©cupÃ©rer le type (user | admin)
+            // récupérer le type (user | admin) et supprime les antislashes
             $type = stripslashes($_REQUEST['type']);
-            $type = mysqli_real_escape_string($conn, $type);
-            $query = "INSERT into `user` (username, type, password)
-            VALUES ('$username', '$type', '".hash('sha256', $password)."')";
-            $res = mysqli_query($conn, $query);
+            $password = hash('sha256', $password);
+            $query = "INSERT into `user` (username, type, password) VALUES (?, ?, ?)";
+            $statement = $pdo->prepare($query);
+            $res = $statement->execute([$username, $type, $password]);
             if($res){
                 echo "
                 <body class='img js-fullheight' style='background-image: url(../images/bg.jpeg);'>
@@ -39,9 +37,9 @@
                 <div class='container'>
                 <div class='row justify-content-center'>
                 <div class='col-md-6 text-center mb-5'>                
-                <h3 class='heading-section'>L'utilisateur a Ã©tÃ© crÃ©Ã© avec succÃ©s.</h3>
+                <h3 class='heading-section'>L'utilisateur a été créé avec succés.</h3>
                 <div class='form-group'>
-                <p>Cliquez <a href='home.php'>ici</a> pour retourner Ã  la page d'accueil</p>
+                <p>Cliquez <a href='home.php'>ici</a> pour retourner à la page d'accueil</p>
                 <script src='../js/jquery.min.js'></script>
                 <script src='../js/popper.js'></script>
                 <script src='../js/bootstrap.min.js'></script>

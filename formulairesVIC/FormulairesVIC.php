@@ -17,6 +17,7 @@
         <script src="html2pdf.bundle.min.js"></script>
         <script src="affichage.js"></script>
         <script src = "signature.js"></script>
+        <script src="multiselect-dropdown.js"></script>
     </head>
     <button id = "pdf" value="Click"> download PDF </button>
     <script type="text/javascript">
@@ -41,7 +42,7 @@
         <?php
         try
         {
-            $bdd = new PDO('mysql:host=localhost;dbname=sps', 'root', '');
+            $bdd = new PDO('mysql:host=localhost;dbname=sps', 'root', 'Sps2023$$');
         }
         catch(Exception $e)
         {
@@ -114,6 +115,7 @@
                     <div class="formbold-mb-5">
                         <label for="Sous-Traitant de" class="formbold-form-label">Sous-Traitant de :</label>
                         <select id = "Titulaire" name="Titulaire"  class="formbold-form-input">
+                        <option value="">Sélectionnez un sous-traitant</option>
                         <?php
                         $reponse = $bdd->query('SELECT * FROM entreprise ORDER BY Nom');
                         while ($donnees = $reponse->fetch())
@@ -159,6 +161,7 @@
                     </div>
                     <br>
                     <strong>Document préparatoire</strong>
+                    <br>
                     <br>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
@@ -219,12 +222,22 @@
                         <label for="AutresChantier" class="formbold-form-label">Autres :</label>
                         <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
                     </div>
-                    <br><strong> Base vie de chantier</strong></br>
+                    <br>Installation hygiène :</br>
                     <br>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5 w-full">
+                                Base vie mobile     <input type="checkbox" name="Local existant"id="Local existant"/>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-half formbold-px-3">
+                            <div class="formbold-mb-5 w-full">
                                 Local existant      <input type="checkbox" name="Local existant"id="Local existant"/>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-half formbold-px-3">
+                            <div class="formbold-mb-5 w-full">
+                            Bungalow chantier     <input type="checkbox" name="Local existant"id="Local existant"/>
                             </div>
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
@@ -296,6 +309,8 @@
                             <input type="text" name="Contrôle" id="Contrôle" class="formbold-form-input"/>
                         </div>
                     </div>
+                    <br>Moyens de secours :</br>
+                    <br>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5">
@@ -416,7 +431,7 @@
                                 <label for="enterres" class="formbold-form-label">Réseaux Aériens</label>
                                 <select id = "Aeriens" name="Aeriens" class="formbold-form-input" multiple multiselect-select-all="true">
                                     <?php
-                                    $reponse = $bdd->query('SELECT * FROM reseauxAeriens ORDER BY nom');
+                                    $reponse = $bdd->query('SELECT * FROM reseauxaeriens ORDER BY nom');
                                     while ($donnees = $reponse->fetch())
                                     {
                                         ?>
@@ -428,7 +443,6 @@
                             </div>
                         </div>
                     </div>
-
                     <br>
                     <br> <h3><strong>Risques</strong></h3> </br>
                     <br>
@@ -444,7 +458,7 @@
                         <label for="ISDD" class="formbold-form-label">Interventions susceptibles d’être dangereuses :</label>
                         <select id = "ISDD" name="ISDD" class="formbold-form-input" multiple multiselect-select-all="true">
                         <?php
-                            $reponse = $bdd->query('SELECT * FROM Interventions ORDER BY Nom');
+                            $reponse = $bdd->query('SELECT * FROM interventions ORDER BY Nom');
                             while ($donnees = $reponse->fetch())
                             {
                                 ?>
@@ -477,57 +491,58 @@
                         <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
                     </div>
                     <fieldset class="flex flex-wrap formbold--mx-3">
-                        <br><h3>Visite du site faite ce jour pour analyse des conditions d’exécution des travaux</h3>
-                        <div class="flex flex-wrap formbold--mx-3">
-                            <div class="w-full sm:w-half formbold-px-3">
-                                <div class="formbold-mb-5 w-full">
+                    <br>
+                    <h3>Visite du site faite ce jour pour analyse des conditions d’exécution des travaux</h3>
+                    <div class="flex flex-wrap formbold--mx-3">
+                        <div class="w-full sm:w-half formbold-px-3">
+                            <div class="formbold-mb-5 w-full">
                                 <br>Entreprise<br>
-                                    Nom        <input type="text" name="Nom" id="Nom"/><br>
-                                    Date :     <labale for ="Date" id="current_date2"/>
-                                    <script>
+                                Nom <input type="text" name="Nom" id="Nom" /><br>
+                                Date : <label for="Date" id="current_date2" />
+                                <script>
                                     date = new Date();
                                     year = date.getFullYear();
                                     month = date.getMonth() + 1;
                                     day = date.getDate();
-                                    document.getElementById("current_date2").innerHTML = day + "/" +month + "/" + year;
-                                    </script>
-                                </div>
+                                    document.getElementById("current_date2").innerHTML = day + "/" + month + "/" + year;
+                                </script>
                             </div>
-                            <div class="w-full sm:w-half formbold-px-3">
-                                <div class="formbold-mb-5">
+                        </div>
+                        <div class="w-full sm:w-half formbold-px-3">
+                            <div class="formbold-mb-5">
                                 <br>coordonnateur S.P.S
-                                    <br>
-                                    Nom        <input type="text" name="Nom" id="Nom" value="MONGARS Gaël"/><br>
-                                    Date :     <labale for ="Date" id="current_date3"/>
-                                    <script>
+                                <br>
+                                Nom <input type="text" name="Nom" id="Nom" value="MONGARS Gaël" /><br>
+                                Date : <label for="Date" id="current_date3" />
+                                <script>
                                     date = new Date();
                                     year = date.getFullYear();
                                     month = date.getMonth() + 1;
                                     day = date.getDate();
-                                    document.getElementById("current_date3").innerHTML = day + "/" +month + "/" + year;
-                                    </script>
-                                </div>
+                                    document.getElementById("current_date3").innerHTML = day + "/" + month + "/" + year;
+                                </script>
                             </div>
+                        </div>
+                        <button type="button" id="signer-button">Signer</button>
+                        <div id="popup" style="display: none;">
                             <div class="container">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <canvas id="sig-canvas" width="220" height="100">
-                                        </canvas>
-                                        <img src="../images/signature.png" width="220" height="100" >
+                                        <canvas id="sig-canvas" width="220" height="100"></canvas>
+                                        <img src="../images/signature.png" width="220" height="100">
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <button class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
-                                        </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
                     </fieldset>
                 </div>
             </div>
         </form>
-        <script src="multiselect-dropdown.js" ></script>
-        <script src = "signature.js"></script>
     </body>
 </html>
