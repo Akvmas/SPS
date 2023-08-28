@@ -14,9 +14,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="initial-scale=1, maximum-scale=1">
         <link rel = "stylesheet" href = "style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
+        <script src="script.js"></script>
         <script src="html2pdf.bundle.min.js"></script>
         <script src="affichage.js"></script>
-        <script src = "signature.js"></script>
         <script src="multiselect-dropdown.js"></script>
     </head>
     <button id = "pdf" value="Click"> download PDF </button>
@@ -42,7 +43,7 @@
         <?php
         try
         {
-            $bdd = new PDO('mysql:host=localhost;dbname=sps', 'root', 'Sps2023$$');
+            $bdd = new PDO('mysql:host=localhost;dbname=sps', 'root', '');
         }
         catch(Exception $e)
         {
@@ -58,7 +59,7 @@
                                 <div class="flex flex-wrap formbold--mx-3">
                                     <div class="w-full sm:w-half formbold-px-3">
                                         <div class="formbold-mb-5 w-full">
-                                            <img class="logo_Eau'sec" src="../images/Eau'Sec.png" class="formbold-form-label">
+                                            <img class="logo_Eau'sec" src="../LogEau17version-carre.png" width="100px"class ="formbold-form-label">
                                         </div>
                                     </div>
                                     <div class="w-full sm:w-half formbold-px-3">
@@ -81,7 +82,7 @@
                     <br>
                     <div class="formbold-mb-5">
                         <label for="Chantier :" class="formbold-form-label">Chantier :</label>
-                        <input type="text"name="Chantier"id="Chantier"class="formbold-form-input"/>
+                        <textarea type="text"name="Chantier"id="Chantier"rows="2" cols="50"class="formbold-form-input"></textarea>
                     </div>
                     <div class="formbold-mb-5">
                         <label for="Maître d’Ouvrage" class="formbold-form-label">Maître d’Ouvrage :</label>
@@ -110,12 +111,12 @@
                     <br>
                     <div class="formbold-mb-5">
                         <label for="Titulaire :" class="formbold-form-label">Titulaire :</label>
-                        <input type="text"name="Sous-Traitant de"id="Sous-Traitant de"class="formbold-form-input"/>
+                        <input type="text"name="Titulaire"id="Titulaire"class="formbold-form-input"/>
                     </div>
                     <div class="formbold-mb-5">
                         <label for="Sous-Traitant de" class="formbold-form-label">Sous-Traitant de :</label>
-                        <select id = "Titulaire" name="Titulaire"  class="formbold-form-input">
-                        <option value="">Sélectionnez un sous-traitant</option>
+                        <select id = "Sous-Traitant de" name="Sous-Traitant de"  class="formbold-form-input">
+                        <option value="">Sélectionnez une entreprise</option>
                         <?php
                         $reponse = $bdd->query('SELECT * FROM entreprise ORDER BY Nom');
                         while ($donnees = $reponse->fetch())
@@ -495,18 +496,17 @@
                     <h3>Visite du site faite ce jour pour analyse des conditions d’exécution des travaux</h3>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
-                            <div class="formbold-mb-5 w-full">
-                                <br>Entreprise<br>
-                                Nom <input type="text" name="Nom" id="Nom" /><br>
-                                Date : <label for="Date" id="current_date2" />
-                                <script>
-                                    date = new Date();
-                                    year = date.getFullYear();
-                                    month = date.getMonth() + 1;
-                                    day = date.getDate();
-                                    document.getElementById("current_date2").innerHTML = day + "/" + month + "/" + year;
-                                </script>
-                            </div>
+                            <br>Entreprise <input type="textarea" name="Titulaire"id="Titulaire" value="" /><br>
+                            Nom <input type="text" name="Nom" id="Nom" /><br>
+                            Date : <label for="Date" id="current_date2" />
+                            <script>
+                                date = new Date();
+                                year = date.getFullYear();
+                                month = date.getMonth() + 1;
+                                day = date.getDate();
+                                document.getElementById("current_date2").innerHTML = day + "/" + month + "/" + year;
+                            </script>
+                            <img id="signature-preview" src="" alt="Votre Signature" width="220" height="100" style="border: 1px solid black;">
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5">
@@ -521,6 +521,7 @@
                                     day = date.getDate();
                                     document.getElementById("current_date3").innerHTML = day + "/" + month + "/" + year;
                                 </script>
+                                <img id="sig-preview" src="../images/signature.png" width="220" height="100">
                             </div>
                         </div>
                         <button type="button" id="signer-button">Signer</button>
@@ -528,17 +529,18 @@
                             <div class="container">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <canvas id="sig-canvas" width="220" height="100"></canvas>
-                                        <img src="../images/signature.png" width="220" height="100">
+                                        <canvas id="sig-canvas" width="220" height="100" style="border: 1px solid black;"></canvas>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <button class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
+                                        <button type="button" class="btn btn-default" id="sig-clearBtn">Clear Signature</button>
+                                        <button type="button" class="btn btn-default" id="sig-saveBtn">sauvegarder</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <input type="hidden" id="signature-data" name="signatureData">
                     </div>
                     </fieldset>
                 </div>

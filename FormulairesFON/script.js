@@ -68,43 +68,45 @@ function openTab(evt, tabName) {
 }
 
 function addObservation(event) {
-  event.preventDefault();
-  observationCount++;
-  var newObservationCount = observationCount; // Nouvelle variable pour le compte de l'observation courante
+    event.preventDefault();
 
-  var tabs = document.getElementById("tabs");
-  var newButton = document.createElement("button");
-  newButton.className = "tab-link";
-  newButton.innerHTML = "Observation " + newObservationCount;
-  newButton.onclick = (event) => openTab(event, 'observation' + newObservationCount);
-  tabs.appendChild(newButton);
+    // Loop pour ajouter 2 nouvelles observations
+    for (let i = 0; i < 1; i++) {
+        observationCount++;
+        var newObservationCount = observationCount; 
 
-  var newDiv = document.createElement("div");
-  newDiv.id = "observation" + newObservationCount;
-  newDiv.className = "tab-content";
-  newDiv.innerHTML = '<form action="upload.php" method="POST" enctype="multipart/form-data">' +
-  '<textarea name="observation' + newObservationCount + '" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..." required></textarea>' +
-  '<br>' +
-  '<input type="file" name="photo' + newObservationCount + '" accept="image/*" required>' +
-  '<br>' +
-  '<label for="entreprise' + newObservationCount + '">Entreprise:</label>' +
-  '<input type="text" name="entreprise' + newObservationCount + '" id="entreprise' + newObservationCount + '" required>' +
-  '<br>' +
-  '<label for="effectif' + newObservationCount + '">Effectif:</label>' +
-  '<input type="text" name="effectif' + newObservationCount + '" id="effectif' + newObservationCount + '" required>' +
-  '</form>';
-  document.getElementById("tabs").after(newDiv);
+        var tabs = document.getElementById("tabs");
+        var newButton = document.createElement("button");
+        newButton.className = "tab-link";
+        newButton.innerHTML = "Observation " + newObservationCount;
+        newButton.onclick = (event) => openTab(event, 'observation' + newObservationCount);
+        tabs.appendChild(newButton);
 
-  // Ajout de code pour réinitialiser les valeurs des champs entreprise et effectif pour chaque nouvelle observation
-  var companyInput = document.getElementById('entreprise' + newObservationCount);
-  var effectiveInput = document.getElementById('effectif' + newObservationCount);
-  if (companyInput && effectiveInput) {
-      companyInput.value = '';
-      effectiveInput.value = '';
-  }
+        var newDiv = document.createElement("div");
+        newDiv.id = "observation" + newObservationCount;
+        newDiv.className = "tab-content";
+        newDiv.innerHTML = `
+            <textarea name="observation${newObservationCount}" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..." ></textarea><br>
+            <input type="file" name="photo${newObservationCount}" accept="image/*" ><br>
+            <label for="entreprise${newObservationCount}">Entreprise:</label>
+            <input type="text" name="entreprise${newObservationCount}" id="entreprise${newObservationCount}" ><br>
+            <label for="effectif${newObservationCount}">Effectif:</label>
+            <input type="text" name="effectif${newObservationCount}" id="effectif${newObservationCount}" >
+        `;
 
-  newButton.click(); // Active le nouvel onglet
+        document.getElementById("tabs").after(newDiv);
+
+        var companyInput = document.getElementById('entreprise' + newObservationCount);
+        var effectiveInput = document.getElementById('effectif' + newObservationCount);
+        if (companyInput && effectiveInput) {
+            companyInput.value = '';
+            effectiveInput.value = '';
+        }
+
+        newButton.click();
+    }
 }
+
 
 function removeObservation(event) {
   event.preventDefault();

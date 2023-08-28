@@ -7,7 +7,7 @@
 </head>
 <body>
   <div class="container">
-    <form id="myForm" action="upload.php" method="POST" enctype="multipart/form-data">
+    <form id="myForm" action="process.php" method="POST" enctype="multipart/form-data">
       <div class="part-one">
         <div class="input-group">
           <label for="chantier">Chantier:</label>
@@ -54,10 +54,10 @@
       </div>
       <div class="text-divider"></div>
       <div class="part-two">
-        <button type="button" onclick="addObservation(event)">+</button>
-        <button type="button" onclick="removeObservation(event)">x</button>
         <div id="tabs">
           <button type="button" class="tab-link active" onclick="openTab(event, 'observation1')">Observation 1</button>
+          <button type="button" class="tab-link" onclick="openTab(event, 'observation2')">Observation 2</button>
+          <button type="button" class="tab-link" onclick="openTab(event, 'observation3')">Observation 3</button>
         </div>
         <br>
         <div id="observation1" class="tab-content" style="display: block;">
@@ -70,6 +70,30 @@
           <br>
           <label for="effectif1">Effectif:</label>
           <input type="text" name="effectif1" id="effectif1"  >
+          <br>
+        </div>
+        <div id="observation2" class="tab-content">
+          <textarea name="observation2" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."></textarea>
+          <br>
+          <input type="file" name="photo2" accept="image/*">
+          <br>
+          <label for="entreprise2">Entreprise:</label>
+          <input type="text" name="entreprise2" id="entreprise2">
+          <br>
+          <label for="effectif2">Effectif:</label>
+          <input type="text" name="effectif2" id="effectif2">
+          <br>
+        </div>
+        <div id="observation3" class="tab-content">
+          <textarea name="observation3" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."></textarea>
+          <br>
+          <input type="file" name="photo3" accept="image/*">
+          <br>
+          <label for="entreprise3">Entreprise:</label>
+          <input type="text" name="entreprise3" id="entreprise3">
+          <br>
+          <label for="effectif3">Effectif:</label>
+          <input type="text" name="effectif3" id="effectif3">
           <br>
         </div>
         <br>

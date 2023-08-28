@@ -1,78 +1,92 @@
 <?php
 include '../config.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // Vérifiez si le fichier a été uploadé sans erreur.
-    if (isset($_FILES['photo1']) && $_FILES['photo1']['error'] == 0) {
-        $allowed = array("jpg" => "image/jpg", "jpeg" => "image/jpeg", "gif" => "image/gif", "png" => "image/png");
-        $filename = $_FILES['photo1']['name'];
-        $filetype = $_FILES['photo1']['type'];
-        $filesize = $_FILES['photo1']['size'];
-    
-        // Vérifiez l'extension du fichier
-        $ext = pathinfo($filename, PATHINFO_EXTENSION);
-        if (!array_key_exists($ext, $allowed)) {
-            die("Erreur : Veuillez sélectionner un format de fichier valide.");
-        }
-    
-        // Vérifiez la taille du fichier - 5MB maximum
-        $maxsize = 5 * 1024 * 1024;
-        if ($filesize > $maxsize) {
-            die("Erreur : La taille du fichier est supérieure à la limite autorisée.");
-        }
-    
-        // Vérifiez le type MIME du fichier
-        if (in_array($filetype, $allowed)) {
-            // Vérifiez si le fichier existe avant de le télécharger.
-            if (file_exists("uploads/" . $_FILES["photo1"]["name"])) {
-                echo $_FILES["photo1"]["name"] . " existe déjà.";
-            } else {
-                move_uploaded_file($_FILES["photo1"]["tmp_name"], "uploads/" . $_FILES["photo1"]["name"]);
-                echo "Votre fichier a été téléchargé avec succès.";
-            }
-        } else {
-            echo "Erreur: Il y a eu un problème lors de l'upload de votre fichier. Veuillez réessayer.";
-        }
-    } else {
-        echo "Erreur: " . $_FILES["photo1"]["error"];
+function saveFormData($postData, $fileData) {
+    global $pdo;
+
+    if (!is_writable("../ImagesChantier/")) {
+        die("Erreur: Le répertoire 'ImagesChantier' n'est pas accessible en écriture.");
     }
-    $chantier = $_POST['chantier'];
-    $maitreOuvrage = $_POST['maitreOuvrage'];
-    $maitreOeuvre = $_POST['maitreOeuvre'];
-    $coordonnateurSPS = $_POST['coordonnateurSPS'];
-    $date = $_POST['date'];
-    $heure = $_POST['heure'];
-    $typeVisite = $_POST['typeVisite'];
-    $autreDescription = $_POST['autreDescription'] ?? null; // Si "autre" est choisi, sinon null
-    $copie = $_POST['copie'];
+    
+    $chantier = $postData['chantier']?? null;
+    $date = date("Ymd");
 
+    $maitreOuvrage = $postData['maitreOuvrage']?? null;
+    $maitreOeuvre = $postData['maitreOeuvre']?? null;
+    $coordonnateurSPS = $postData['coordonnateurSPS']?? null;
+    $dateVisite = $postData['date']?? null;
+    $heure = $postData['heure']?? null;
+    $typeVisite = $postData['typeVisite'] ?? null;
+    $autreDescription = $postData['autreDescription'] ?? null;
 
-    // Insertion dans la table Chantier
-    $stmt = $pdo->prepare("INSERT INTO Chantier (description, maitreOuvrage, maitreOeuvre, coordonnateurSPS, date, heure, typeVisite, autreDescription) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$chantier, $maitreOuvrage, $maitreOeuvre, $coordonnateurSPS, $date, $heure, $typeVisite, $autreDescription]);
+    $stmt = $pdo->prepare("INSERT INTO chantiers (description, maitreOuvrage, maitreOeuvre, coordonnateurSPS, date, heure, typeVisite, autreDescription) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$chantier, $maitreOuvrage, $maitreOeuvre, $coordonnateurSPS, $dateVisite, $heure, $typeVisite, $autreDescription]);
 
-    $chantierId = $pdo->lastInsertId();  // Récupère l'ID du dernier chantier inséré
-
-    // Insertion des personnes présentes
-    $personIndex = 1;
-    while(isset($_POST['personne' . $personIndex])) {
-        $personne = $_POST['personne' . $personIndex];
-        $stmt = $pdo->prepare("INSERT INTO PersonnePrésente (chantier_id, nom) VALUES (?, ?)");
-        $stmt->execute([$chantierId, $personne]);
-        $personIndex++;
-    }
-
-    // Insertion des observations
     $obsIndex = 1;
-    while(isset($_POST['observation' . $obsIndex])) {
-        $observation = $_POST['observation' . $obsIndex];
-        $photo = $_FILES['photo' . $obsIndex]['name'];  // A traiter séparément pour sauvegarder le fichier sur le serveur
-        $entreprise = $_POST['entreprise' . $obsIndex];
-        $effectif = $_POST['effectif' . $obsIndex];
-        $stmt = $pdo->prepare("INSERT INTO Observation (chantier_id, texte, photo, entreprise, effectif) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$chantierId, $observation, $photo, $entreprise, $effectif]);
+    $allowed = array("jpg" => "image/jpg", "jpeg" => "image/jpeg", "gif" => "image/gif", "png" => "image/png");
+    $maxsize = 5 * 1024 * 1024;
+
+    while (isset($postData['observation' . $obsIndex]) && !empty($postData['observation' . $obsIndex])) {
+        $observation = $postData['observation' . $obsIndex];
+        $entreprise = $postData['entreprise' . $obsIndex] ?? null;
+        $effectif = $postData['effectif' . $obsIndex] ?? null;
+
+        $photo = null;
+        if (isset($fileData['photo' . $obsIndex]) && $fileData['photo' . $obsIndex]['error'] == 0) {
+            $filename = $fileData['photo' . $obsIndex]['name'];
+            $filetype = $fileData['photo' . $obsIndex]['type'];
+            $filesize = $fileData['photo' . $obsIndex]['size'];
+
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            if (array_key_exists($ext, $allowed) && in_array($filetype, $allowed) && $filesize <= $maxsize) {
+
+                $newFilename = $chantier . "_" . $date . "_observation" . $obsIndex . "." . $ext;
+                if (file_exists("../ImagesChantier/" . $newFilename)) {
+                    $newFilename = $chantier . "_" . $date . "_observation" . $obsIndex . "_" . time() . "." . $ext;
+                }
+
+                if (!move_uploaded_file($fileData['photo' . $obsIndex]["tmp_name"], "../ImagesChantier/" . $newFilename)) {
+                    echo "Erreur lors du déplacement du fichier vers 'ImagesChantier/'.";
+                } else {
+                    $photo = $newFilename;
+                }
+
+            } else {
+                echo "Erreur lors du téléchargement de la photo " . $obsIndex . ".";
+            }
+        } elseif (isset($fileData['photo' . $obsIndex])) {
+            switch ($fileData['photo' . $obsIndex]['error']) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    echo "La photo téléchargée est trop volumineuse.";
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    echo "La photo a été partiellement téléchargée.";
+                    break;
+                case UPLOAD_ERR_NO_FILE:
+                    echo "Aucun fichier n'a été téléchargé.";
+                    break;
+                case UPLOAD_ERR_NO_TMP_DIR:
+                    echo "Il manque un dossier temporaire.";
+                    break;
+                case UPLOAD_ERR_CANT_WRITE:
+                    echo "Échec de l'écriture du fichier sur le disque.";
+                    break;
+                case UPLOAD_ERR_EXTENSION:
+                    echo "Une extension PHP a arrêté le téléchargement du fichier.";
+                    break;
+                default:
+                    echo "Erreur de téléchargement inconnue.";
+                    break;
+            }
+        }
+
+        // Ajustement de la requête pour ne pas utiliser chantierId
+        $stmt = $pdo->prepare("INSERT INTO observations (texte, photo, entreprise, effectif) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$observation, $photo, $entreprise, $effectif]);
+
         $obsIndex++;
     }
+    return true;
 }
 ?>
