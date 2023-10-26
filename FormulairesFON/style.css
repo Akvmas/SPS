@@ -30,13 +30,11 @@ body {
 }
 .part-three {
   display: flex;
-  justify-content: space-between;
 }
 .radio-buttons label {
   font-weight: normal;
 }
 .column1 {
-  border-right: 1px solid #000; /* Cela ajoute une bordure de 1px de largeur, solide et de couleur noire sur le côté droit de la div */
   padding-right: 20px; /* Cela ajoute un peu d'espace entre le texte et la ligne verticale */
 }
 

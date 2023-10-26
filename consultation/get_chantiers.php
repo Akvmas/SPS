@@ -19,7 +19,7 @@ $result_personnes = $stmt->fetchAll();
 $sql_observations = "SELECT * FROM observations WHERE chantier_id=:chantier_id";
 $stmt = $pdo->prepare($sql_observations);
 $stmt->execute(['chantier_id' => $chantier_id]);
-$result_observations = $stmt->fetchAll();
+$result_observations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Enregistrement des résultats dans des variables de session pour les récupérer sur la page HTML
 session_start();
@@ -28,5 +28,5 @@ $_SESSION['personnes'] = $result_personnes;
 $_SESSION['observations'] = $result_observations;
 
 // Redirection vers la page du formulaire avec l'ID du chantier en paramètre d'URL
-header("Location: FonConsultations.php?id=".$chantier_id);
+header("Location: FonConsultations.php?chantier_id=".$chantier_id);
 ?>

@@ -2,7 +2,7 @@
 // Inclure les dépendances et configurations
 include '../config.php';
 require('../vendor/autoload.php');
-ini_set('memory_limit', '256M');
+ini_set('memory_limit', '500M');
 session_start();
 
 global $pdo;
@@ -26,35 +26,17 @@ function isValidImage($blob) {
 // Fonction pour obtenir les chemins des images pour une observation
 function getImagePathsForObservation($chantierId, $observationNumber) {
     global $pdo;
-
     $stmt = $pdo->prepare("SELECT photo FROM observations WHERE chantier_id = ? AND observation_number = ?");
     $stmt->execute([$chantierId, $observationNumber]);
-
-    $photos = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    $imagePaths = [];
-
-    foreach ($photos as $photoBlob) {
-        if (!$photoBlob) {
-            echo "Erreur: Image BLOB vide.";
-            continue;
-        }
-
-        if (strlen($photoBlob) > (5 * 1024 * 1024)) { // 5MB
-            echo "Erreur: Image trop volumineuse.";
-            continue;
-        }
-
-        if (!isValidImage($photoBlob)) {
-            echo "Erreur: Format d'image non valide ou non supporté.";
-            continue;
-        }
-
-        $imagePath = tempnam(sys_get_temp_dir(), 'obs');
-        file_put_contents($imagePath, $photoBlob);
-        $imagePaths[] = $imagePath;
+    
+    $imageFilePaths = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $photoContent = $row['photo'];
+        $tempFileName = tempnam(sys_get_temp_dir(), 'pdf_img_') . '.jpg';  // This creates a unique temporary file. We assume images are JPEGs.
+        file_put_contents($tempFileName, $photoContent);
+        $imageFilePaths[] = $tempFileName;
     }
-
-    return $imagePaths;
+    return $imageFilePaths;
 }
 
 // Fonction pour enregistrer les données du formulaire dans la base de données
@@ -66,24 +48,30 @@ function saveFormData($postData, $fileData) {
     $maitreOuvrage = $postData['maitreOuvrage'] ?? null;
     $maitreOeuvre = $postData['maitreOeuvre'] ?? null;
     $coordonnateurSPS = $postData['coordonnateurSPS'] ?? null;
-    $typeVisite = $postData['typeVisite'] ?? null;
-    $autreDescription = $postData['autreDescription'] ?? null;
+    
 
-    $stmt = $pdo->prepare("INSERT INTO chantiers (description, maitreOuvrage, maitreOeuvre, coordonnateurSPS, typeVisite, autreDescription) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$chantier, $maitreOuvrage, $maitreOeuvre, $coordonnateurSPS, $typeVisite, $autreDescription]);
+    $stmt = $pdo->prepare("INSERT INTO chantiers (description, maitreOuvrage, maitreOeuvre, coordonnateurSPS) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$chantier, $maitreOuvrage, $maitreOeuvre, $coordonnateurSPS]);
 
     $chantierId = $pdo->lastInsertId();
 
     $obsIndex = 1;
     $allowed = array("jpg" => "image/jpg", "jpeg" => "image/jpeg", "gif" => "image/gif", "png" => "image/png");
-    $maxsize = 5 * 1024 * 1024;
+    $maxsize = 5 * 1920 * 1080;
 
     while (isset($postData['observation' . $obsIndex]) && !empty($postData['observation' . $obsIndex])) {
         $observation = $postData['observation' . $obsIndex];
         $entreprise = $postData['entreprise' . $obsIndex] ?? null;
         $effectif = $postData['effectif' . $obsIndex] ?? null;
-        $dateObservation = $postData['date' . $obsIndex] ?? null;  // Get the date for the observation
-        $heureObservation = $postData['heure' . $obsIndex] ?? null;  // Get the time for the observation
+        $dateObservation = $postData['date' . $obsIndex] ?? null;
+        $heureObservation = $postData['heure' . $obsIndex] ?? null;
+        $typeVisite = $postData['typeVisite' . $obsIndex] ?? null;
+        if ($typeVisite === 'autre') {
+            $autreDescription = $postData['autreDescription' . $obsIndex] ?? null;
+        } else {
+            $autreDescription = null;
+        }
+
     
         if (isset($fileData['photos' . $obsIndex])) {
             foreach ($fileData['photos' . $obsIndex]['name'] as $key => $filename) {
@@ -95,10 +83,11 @@ function saveFormData($postData, $fileData) {
                     $photoContent = file_get_contents($fileData['photos' . $obsIndex]["tmp_name"][$key]);
                 } else {
                     echo "Erreur lors du téléchargement de la photo " . $obsIndex . ".";
+                    continue; // Skip this iteration and move to the next photo
                 }
     
-                $stmt = $pdo->prepare("INSERT INTO observations (chantier_id, observation_number, texte, photo, entreprise, effectif, date, heure) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$chantierId, $obsIndex, $observation, $photoContent, $entreprise, $effectif, $dateObservation, $heureObservation]);
+                $stmt = $pdo->prepare("INSERT INTO observations (chantier_id, observation_number, texte, photo, entreprise, effectif, date, heure, typeVisite, autreDescription) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$chantierId, $obsIndex, $observation, $photoContent, $entreprise, $effectif, $dateObservation, $heureObservation, $typeVisite, $autreDescription]);
             }
         }
     
@@ -134,13 +123,13 @@ function generatePdf($postData, $chantierId) {
     $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
     $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
     $pdf->AddPage();
-    
+
     // Add general data to PDF
     $pdf->SetFont('helvetica', 'B', 14);
     $pdf->Ln(30);
-    
+
     if (!empty($postData['chantier'])) {
-        $pdf->Cell(0, 0, 'Chantier: ' . clean_input($postData['chantier']), 0, 1, '');
+        $pdf->MultiCell(0, 10, 'Chantier: ' . clean_input($postData['chantier']), 0, 'L');
         $pdf->Ln(5);
     }
     
@@ -179,36 +168,68 @@ function generatePdf($postData, $chantierId) {
         $pdf->Cell(0, 0, 'Coordonnateur S.P.S.: ' . clean_input($postData['coordonnateurSPS']), 0, 1, '');
     }
     
-    if (!empty($postData['date'])) {
-        $pdf->Cell(0, 0, 'Date: ' . clean_input($postData['date']), 0, 1, '');
-    }
-    
-    if (!empty($postData['heure'])) {
-        $pdf->Cell(0, 0, 'Heure: ' . clean_input($postData['heure']), 0, 1, '');
-    }
-    
-    if (!empty($postData['autreDescription'])) {
-        $pdf->Cell(0, 0, 'Description: ' . clean_input($postData['autreDescription']), 0, 1, '');
-    }
     
     $y = $pdf->GetY();
     $pdf->Line(10, $y, 200, $y);
     $pdf->Ln(2);
-    
+
     $i = 1;
     while (isset($postData["observation{$i}"]) && !empty($postData["observation{$i}"])) {
-        $pdf->Cell(0, 0, 'Observation N°' . $i . ': ' . clean_input($postData["observation{$i}"]), 0, 1, '');
+        $pdf->MultiCell(0, 10, 'Observation ' . $i . ': ' . clean_input($postData["observation{$i}"]), 0, 'L');
         
         $imageFilePaths = getImagePathsForObservation($chantierId, $i);
     
         foreach ($imageFilePaths as $imageFilePath) {
             if ($imageFilePath) {
-                $pdf->Image($imageFilePath, '', '', 0, 60, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                $pdf->Ln(65);
-                unlink($imageFilePath); // Delete the temporary image after use
+                // Définir une hauteur maximale pour l'image
+                $maxHeight = 60; // par exemple, 60mm
+        
+                // Obtenir les dimensions de l'image originale
+                list($width, $height) = getimagesize($imageFilePath);
+        
+                // Calculer la nouvelle largeur en fonction de la hauteur maximale tout en conservant les proportions
+                $newWidth = ($maxHeight / $height) * $width;
+        
+                // Obtenir les marges actuelles
+                $margins = $pdf->getMargins();
+                $pageWidth = 210 - $margins['left'] - $margins['right']; // 210mm est la largeur d'une page A4
+        
+                // Ajuster la largeur maximale de l'image pour qu'elle respecte les marges
+                if ($newWidth > $pageWidth) {
+                    $newWidth = $pageWidth;
+                    $maxHeight = ($newWidth / $width) * $height;
+                }
+        
+                // Calculer la position x pour centrer l'image en tenant compte des marges
+                $x = $margins['left'] + ($pageWidth - $newWidth) / 2;
+        
+                $pdf->Image($imageFilePath, $x, '', $newWidth, $maxHeight, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
+                $pdf->Ln($maxHeight + 5); // Ajouter un espace aprés l'image
+                unlink($imageFilePath); // Supprimer l'image temporaire aprés utilisation
             }
         }
-    
+        if (!empty($postData["date{$i}"])) {
+            $pdf->Cell(0, 0, 'Date: ' . clean_input($postData["date{$i}"]), 0, 1, '');
+        }
+        
+        if (!empty($postData["heure{$i}"])) {
+            $pdf->Cell(0, 0, 'Heure: ' . clean_input($postData["heure{$i}"]), 0, 1, '');
+        }
+        if (!empty($postData["typeVisite{$i}"])) {
+            $typeVisite = clean_input($postData["typeVisite{$i}"]);
+            
+            // Vérifiez si la valeur contient un espace et ajoutez-le si nécessaire
+            if (!strpos($typeVisite, ' ')) {
+                $typeVisite = str_replace('visiteInopinee', 'visite Inopinee', $typeVisite);
+            }
+            
+            $pdf->Cell(0, 0, 'Type de Visite: ' . $typeVisite, 0, 1, '');
+        }
+        
+        
+        if ($postData["typeVisite{$i}"] === 'autre' && !empty($postData["autreDescription{$i}"])) {
+            $pdf->Cell(0, 0, 'Description: ' . clean_input($postData["autreDescription{$i}"]), 0, 1, '');
+        }
         if (!empty($postData["entreprise{$i}"])) {
             $pdf->Cell(0, 0, 'Entreprise: ' . clean_input($postData["entreprise{$i}"]), 0, 1, '');
         }
@@ -216,15 +237,27 @@ function generatePdf($postData, $chantierId) {
         if (!empty($postData["effectif{$i}"])) {
             $pdf->Cell(0, 0, 'Effectif: ' . clean_input($postData["effectif{$i}"]), 0, 1, '');
         }
-    
+        
+        
         $pdf->Ln(5);
         $y = $pdf->GetY();
         $pdf->Line(10, $y, 200, $y);
         $pdf->Ln(2);
         $i++;
-    }
 
-    $pdfFilename = __DIR__ . '/../RenduPdf/' . date('YmdHis') . '.pdf';
+        // Ajoutez la phrase dans le PDF
+        
+        $pdf->Ln(); // Sautez une ligne pour l'espace
+
+        // Texte à ajouter
+        $texte = "Sans remarque de la part de l’entreprise dans un délai de 8 jours, les observations formulées par le Coordonnateur S.P.S. sont réputées acceptées sans réserve.";
+
+        $pdf->MultiCell(0, 10, $texte, 0, 'L'); // Ajoutez le texte avec une largeur de cellule de 0 (auto) et un alignement à gauche
+
+    }
+    $chantierName = preg_replace("/[^a-zA-Z0-9]/", "_", $postData['chantier']); // Remplacez les caractéres non alphanumériques par des underscores pour éviter les problémes de nom de fichier
+    $currentDate = date('Ymd');
+    $pdfFilename = __DIR__ . "/../RenduPdf/{$chantierName}_{$currentDate}.pdf";
     $pdf->Output($pdfFilename, 'F');
     
     return $pdfFilename;
@@ -233,7 +266,7 @@ function generatePdf($postData, $chantierId) {
 // Enregistrez les données du formulaire dans la base de données
 $chantierId = saveFormData($_POST, $_FILES);
 if ($chantierId) {
-    echo "Données enregistrées avec succès.<br>";
+    echo "Données enregistrées avec succés.<br>";
 } else {
     die("Erreur lors de l'enregistrement des données.");
 }

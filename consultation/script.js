@@ -4,11 +4,13 @@ var companyValues = [];
 var effectiveValues = [];
 
 window.onload = function() {
-    ["autre", "reunion", "visiteInopinee"].forEach(function(id) {
-        document.getElementById(id).addEventListener("change", function() {
-            document.getElementById("autreText").style.display = this.checked && id == "autre" ? "block" : "none";
+    for (let i = 1; i <= 3; i++) {
+        ["autre", "reunion", "visiteInopinee"].forEach(function(type) {
+            document.getElementById(type + i).addEventListener("change", function() {
+                document.getElementById("autreText" + i).style.display = this.checked && type == "autre" ? "block" : "none";
+            });
         });
-    });
+    }
 
     document.getElementById('myForm').addEventListener('submit', function(event) {
         if (!validateForm()) {
@@ -22,7 +24,6 @@ window.onload = function() {
         }
     });
 }
-
 function validateForm() {
   companyValues = [];
   effectiveValues = [];
@@ -86,6 +87,21 @@ function addObservation(event) {
         newDiv.id = "observation" + newObservationCount;
         newDiv.className = "tab-content";
         newDiv.innerHTML = `
+            <label>Type de visite:</label>
+            <div class="radio-buttons">
+                <label for="reunion${newObservationCount}"><input type="radio" id="reunion${newObservationCount}" name="typeVisite${newObservationCount}" value="reunion">Réunion</label>
+                <label for="visiteInopinee${newObservationCount}"><input type="radio" id="visiteInopinee${newObservationCount}" name="typeVisite${newObservationCount}" value="visiteInopinee">Visite inopinée</label>
+                <label for="autre${newObservationCount}"><input type="radio" id="autre${newObservationCount}" name="typeVisite${newObservationCount}" value="autre">Autre</label>
+            </div>
+            <div class="input-group" id="autreText${newObservationCount}" style="display: none;">
+                <label for="autreDescription${newObservationCount}">Précisez:</label>
+                <input type="text" name="autreDescription${newObservationCount}" id="autreDescription${newObservationCount}">
+            </div>
+            <label>Date:</label>
+            <input type="date" name="date${newObservationCount}" id="date${newObservationCount}">
+            <label>Heure:</label>
+            <input type="time" name="heure${newObservationCount}" id="heure${newObservationCount}">
+            <br>
             <textarea name="observation${newObservationCount}" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..." ></textarea><br>
             <input type="file" name="photo${newObservationCount}" accept="image/*" ><br>
             <label for="entreprise${newObservationCount}">Entreprise:</label>
@@ -95,6 +111,11 @@ function addObservation(event) {
         `;
 
         document.getElementById("tabs").after(newDiv);
+
+        // Ajout d'un écouteur d'événements pour gérer l'affichage du champ "Précisez"
+        document.getElementById("autre" + newObservationCount).addEventListener("change", function() {
+            document.getElementById("autreText" + newObservationCount).style.display = this.checked ? "block" : "none";
+        });
 
         var companyInput = document.getElementById('entreprise' + newObservationCount);
         var effectiveInput = document.getElementById('effectif' + newObservationCount);

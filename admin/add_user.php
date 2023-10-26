@@ -2,7 +2,7 @@
 <?php
   // Initialiser la session
   session_start();
-  // Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
+  // Vï¿½rifiez si l'utilisateur est connectï¿½, sinon redirigez-le vers la page de connexion
   if(!isset($_SESSION["username"])){
     header("Location: login.php");
     exit(); 
@@ -20,11 +20,11 @@
     <?php
         require('../config.php');
         if (isset($_REQUEST['username'],$_REQUEST['type'], $_REQUEST['password'])){
-            // récupérer le nom d'utilisateur et supprime les antislashes
+            // rï¿½cupï¿½rer le nom d'utilisateur et supprime les antislashes
             $username = stripslashes($_REQUEST['username']);
-            // récupérer le mot de passe et supprime les antislashes
+            // rï¿½cupï¿½rer le mot de passe et supprime les antislashes
             $password = stripslashes($_REQUEST['password']);
-            // récupérer le type (user | admin) et supprime les antislashes
+            // rï¿½cupï¿½rer le type (user | admin) et supprime les antislashes
             $type = stripslashes($_REQUEST['type']);
             $password = hash('sha256', $password);
             $query = "INSERT into `user` (username, type, password) VALUES (?, ?, ?)";
@@ -37,9 +37,9 @@
                 <div class='container'>
                 <div class='row justify-content-center'>
                 <div class='col-md-6 text-center mb-5'>                
-                <h3 class='heading-section'>L'utilisateur a été créé avec succés.</h3>
+                <h3 class='heading-section'>L'utilisateur a Ã©tÃ© crÃ©Ã© avec succÃ©s.</h3>
                 <div class='form-group'>
-                <p>Cliquez <a href='home.php'>ici</a> pour retourner à la page d'accueil</p>
+                <p>Cliquez <a href='home.php'>ici</a> pour retourner Ã  la page d'accueil</p>
                 <script src='../js/jquery.min.js'></script>
                 <script src='../js/popper.js'></script>
                 <script src='../js/bootstrap.min.js'></script>

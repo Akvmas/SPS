@@ -4,7 +4,10 @@ require '../config.php';
 $id = $_GET['id'];
 
 $stmt = $pdo->prepare('
-  SELECT chantiers.*, personnes_presentes.personne, observations.observation, observations.entreprise, observations.effectif, observations.photo 
+  SELECT chantiers.*, personnes_presentes.personne, 
+         observations.observation, observations.entreprise, 
+         observations.effectif, observations.photo, 
+         observations.typeVisite, observations.date, observations.heure 
   FROM chantiers 
   LEFT JOIN personnes_presentes ON chantiers.id = personnes_presentes.chantier_id
   LEFT JOIN observations ON chantiers.id = observations.chantier_id
@@ -25,9 +28,13 @@ foreach($data as $row) {
       'observation' => $row['observation'],
       'entreprise' => $row['entreprise'],
       'effectif' => $row['effectif'],
-      'photo' => $row['photo']
+      'photo' => $row['photo'],
+      'typeVisite' => $row['typeVisite'],
+      'date' => $row['date'],
+      'heure' => $row['heure']
     ];
   }
 }
 
 echo json_encode($result);
+?>

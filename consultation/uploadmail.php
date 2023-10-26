@@ -2,7 +2,71 @@
 require('../vendor/autoload.php');
 require('../config.php');
 ini_set('memory_limit', '256M');
+session_start();
+$chantier = $_SESSION['chantier'];
+$personnes = $_SESSION['personnes'];
+$observations = $_SESSION['observations'];
 
+global $pdo;
+
+// Fonction pour nettoyer les entrées
+function clean_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
+// Fonction pour vérifier la validité de l'image
+function isValidImage($blob) {
+    $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->buffer($blob);
+    return in_array($mime, $allowedMimes);
+}
+function getImagePathsForObservation($chantierId, $observationNumber) {
+    global $pdo;
+
+    $stmt = $pdo->prepare("SELECT photo FROM observations WHERE chantier_id = ? AND observation_number = ?");
+    $stmt->execute([$chantierId, $observationNumber]);
+
+    $photos = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $imagePaths = [];
+
+    foreach ($photos as $photoBlob) {
+        if (!$photoBlob) {
+            echo "Erreur: Image BLOB vide.";
+            continue;
+        }
+
+        if (strlen($photoBlob) > (5 * 1024 * 1024)) { // 5MB
+            echo "Erreur: Image trop volumineuse.";
+            continue;
+        }
+
+        if (!isValidImage($photoBlob)) {
+            echo "Erreur: Format d'image non valide ou non supporté.";
+            continue;
+        }
+
+        $imagePath = tempnam(sys_get_temp_dir(), 'obs');
+        file_put_contents($imagePath, $photoBlob);
+        $imagePaths[] = $imagePath;
+    }
+
+    return $imagePaths;
+}
+
+function getImageFromDatabase($chantierId) {
+    global $pdo;
+
+    $stmt = $pdo->prepare("SELECT photo FROM observations WHERE chantier_id = ?");
+    $stmt->execute([$chantierId]);
+
+    return $stmt->fetchColumn();
+}
+
+// Classe PDF personnalisée
 class MYPDF extends TCPDF {
     public function Header() {
         $this->SetFont('helvetica', 'B', 20);
@@ -17,23 +81,8 @@ class MYPDF extends TCPDF {
     }
 }
 
-function clean_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
-
-function getImagePathFromDatabase($chantierId) {
-    global $pdo;
-
-    $stmt = $pdo->prepare("SELECT photo FROM observations WHERE chantier_id = ?");
-    $stmt->execute([$chantierId]);
-
-    return $stmt->fetchColumn();
-}
-
-function generatePdf($postData) {
+// Fonction pour générer le PDF
+function generatePdf($postData, $chantierId) {
     $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
     $pdf->SetCreator(PDF_CREATOR);
@@ -45,79 +94,114 @@ function generatePdf($postData) {
     $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
     $pdf->AddPage();
     
-    // Add general data to PDF
     $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Ln(30);
-    $pdf->Cell(0, 0, 'Chantier: ' . clean_input($postData['chantierNom']), 0, 1, '');
-    $pdf->Ln(5);
+$pdf->Ln(30);
 
-    $pdf->SetFont('helvetica', '', 12);
-    $pdf->Cell(0, 0, 'Maitre Ouvrage: ' . clean_input($postData['maitreOuvrage']), 0, 1, '');
-    $pdf->Cell(0, 0, 'Maitre Oeuvre: ' . clean_input($postData['maitreOeuvre']), 0, 1, '');
+if (!empty($postData['chantier'])) {
+    $pdf->Cell(0, 0, 'Chantier: ' . clean_input($postData['chantier']), 0, 1, '');
     $pdf->Ln(5);
-    $y = $pdf->GetY();  // Obtenir la position y actuelle
-    $pdf->Line(10, $y, 200, $y);
-    $pdf->Ln(2);
-    // Add persons
-    $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Cell(0, 0, 'Personnes présentes:', 0, 1, '');
-    $pdf->SetFont('helvetica', '', 12);
-    
-    $i = 1;
-    while (isset($postData["personne{$i}"])) {
-        $pdf->Cell(0, 0, clean_input($postData["personne{$i}"]), 0, 1, '');
-        $i++;
-    }
+}
 
-    $pdf->Ln(5);
-    $y = $pdf->GetY();  // Obtenir la position y actuelle
-    $pdf->Line(10, $y, 200, $y);
-    $pdf->Ln(2);
+$pdf->SetFont('helvetica', '', 12);
 
+if (!empty($postData['maitreOuvrage'])) {
+    $pdf->Cell(0, 0, 'Maitre d\'Ouvrage: ' . clean_input($postData['maitreOuvrage']), 0, 1, '');
+}
+
+if (!empty($postData['maitreOeuvre'])) {
+    $pdf->Cell(0, 0, 'Maitre d\'Oeuvre: ' . clean_input($postData['maitreOeuvre']), 0, 1, '');
+}
+
+if (!empty($postData['coordonnateurSPS'])) {
     $pdf->Cell(0, 0, 'Coordonnateur S.P.S.: ' . clean_input($postData['coordonnateurSPS']), 0, 1, '');
-    $pdf->Cell(0, 0, 'Date: ' . clean_input($postData['date']), 0, 1, '');
-    $pdf->Cell(0, 0, 'Heure: ' . clean_input($postData['heure']), 0, 1, '');
-    $pdf->Cell(0, 0, 'Description: ' . (isset($postData['autreDescription']) ? clean_input($postData['autreDescription']) : ""), 0, 1, '');
-    
-    $y = $pdf->GetY();  // Obtenir la position y actuelle
-    $pdf->Line(10, $y, 200, $y);
-    $pdf->Ln(2);
-    $chantierId = clean_input($postData['chantier_id']); 
+}
 
-    $i = 1;
-    while (isset($postData["observationText{$i}"])) {
-        $pdf->Cell(0, 0, 'Observation N°' . $i . ': ' . clean_input($postData["observationText{$i}"]), 0, 1, '');
+$pdf->Ln(5);
+$y = $pdf->GetY();
+$pdf->Line(10, $y, 200, $y);
+$pdf->Ln(2);
+
+// Add persons
+$pdf->SetFont('helvetica', 'B', 14);
+$pdf->Cell(0, 0, 'Personnes présentes:', 0, 1, '');
+$pdf->SetFont('helvetica', '', 12);
+
+$i = 1;
+while (isset($postData["personne{$i}"]) && !empty($postData["personne{$i}"])) {
+    $pdf->Cell(0, 0, clean_input($postData["personne{$i}"]), 0, 1, '');
+    $i++;
+}
+
+$pdf->Ln(5);
+$y = $pdf->GetY();
+$pdf->Line(10, $y, 200, $y);
+$pdf->Ln(2);
+
+// Add observations
+$pdf->SetFont('helvetica', 'B', 14);
+$pdf->Cell(0, 0, 'Observations:', 0, 1, '');
+
+$i = 1;
+    while (isset($postData["observation{$i}"]) && !empty($postData["observation{$i}"])) {
+        $pdf->Cell(0, 0, 'Observation N°' . $i . ': ' . clean_input($postData["observation{$i}"]), 0, 1, '');
         
-        $imageFileName = getImagePathFromDatabase($chantierId);
+        $imageFilePaths = getImagePathsForObservation($chantierId, $i);
 
-        if ($imageFileName) {
-            $imageFilePath = realpath(dirname(__FILE__)) . '/../ImagesChantier/' . $imageFileName;
-            
-            if (file_exists($imageFilePath)) {
-                $pdf->Image($imageFilePath, '', '', 0, 60, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                $pdf->Ln(65);
-            } else {
-                die("L'image n'existe pas: " . $imageFilePath);
+        foreach ($imageFilePaths as $imageFilePath) {
+            if ($imageFilePath) {
+                $maxHeight = 60;
+                list($width, $height) = getimagesize($imageFilePath);
+                $newWidth = ($maxHeight / $height) * $width;
+                $margins = $pdf->getMargins();
+                $pageWidth = 210 - $margins['left'] - $margins['right'];
+
+                if ($newWidth > $pageWidth) {
+                    $newWidth = $pageWidth;
+                    $maxHeight = ($newWidth / $width) * $height;
+                }
+
+                $x = $margins['left'] + ($pageWidth - $newWidth) / 2;
+
+                $pdf->Image($imageFilePath, $x, '', $newWidth, $maxHeight, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
+                $pdf->Ln($maxHeight + 5);
+                unlink($imageFilePath);
             }
         }
 
+        // Ajoutez les autres détails pour cette observation
+        $fields = [
+            'date' => 'Date',
+            'heure' => 'Heure',
+            'typeVisite' => 'Type de Visite',
+            'autreDescription' => 'Description',
+            'entreprise' => 'Entreprise',
+            'effectif' => 'Effectif',
+        ];
+
+        foreach ($fields as $key => $label) {
+            if (!empty($postData["{$key}{$i}"])) {
+                $pdf->Cell(0, 0, $label . ': ' . clean_input($postData["{$key}{$i}"]), 0, 1, '');
+            }
+        }
+
+        if ($postData["typeVisite{$i}"] === 'autre' && empty($postData["autreDescription{$i}"])) {
+            $pdf->Cell(0, 0, 'Description: Non spécifié', 0, 1, '');
+        }
+
         $pdf->Ln(5);
-        $pdf->Cell(0, 0, 'Entreprise: ' . clean_input($postData["entreprise{$i}"]), 0, 1, '');
-        $pdf->Cell(0, 0, 'Effectif: ' . clean_input($postData["effectif{$i}"]), 0, 1, '');
-        $pdf->Ln(5);
-        $pdf->Ln(5);
-        $y = $pdf->GetY();  // Obtenir la position y actuelle
+        $y = $pdf->GetY();
         $pdf->Line(10, $y, 200, $y);
         $pdf->Ln(2);
         $i++;
+
     }
-
-    $pdfFilename = __DIR__ . '/../RenduPdf/' . clean_input($postData['chantierNom']) . '_' . clean_input($postData['date']) . '.pdf';
+    $chantierName = preg_replace("/[^a-zA-Z0-9]/", "_", $postData['chantierNom']); // Remplacez les caractères non alphanumériques par des underscores pour éviter les problèmes de nom de fichier
+    $currentDate = date('Ymd');
+    $pdfFilename = __DIR__ . "/../RenduPdf/{$chantierName}_{$currentDate}.pdf";
     $pdf->Output($pdfFilename, 'F');
-
+    
     return $pdfFilename;
 }
-
-$pdfFilename = generatePdf($_POST);
+// Générez le PDF
+$pdfFilename = generatePdf($_POST, $chantierId);
 echo "PDF généré: " . $pdfFilename;
-?>

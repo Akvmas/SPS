@@ -20,12 +20,9 @@
         <script src="affichage.js"></script>
         <script src="multiselect-dropdown.js"></script>
     </head>
-    <button id = "pdf" value="Click"> download PDF </button>
+    <button id = "pdf" value="Click"> PDF </button>
     <script type="text/javascript">
     input = document.getElementById('pdf');
-    input.addEventListener('click', function(){
-        input.style.display = 'none';
-    });
     document.getElementById('pdf').onclick = function (){
         var element = document.getElementById('formVIC');
 
@@ -43,7 +40,7 @@
         <?php
         try
         {
-            $bdd = new PDO('mysql:host=localhost;dbname=sps', 'root', '');
+            $bdd = new PDO('mysql:host=localhost;dbname=sps', 'sps', 'EauSec2023$$');
         }
         catch(Exception $e)
         {
@@ -82,7 +79,7 @@
                     <br>
                     <div class="formbold-mb-5">
                         <label for="Chantier :" class="formbold-form-label">Chantier :</label>
-                        <textarea type="text"name="Chantier"id="Chantier"rows="2" cols="50"class="formbold-form-input"></textarea>
+                        <textarea type="text"name="Chantier"id="Chantier"rows="3" cols="50" maxlength="1000"class="formbold-form-input"></textarea>
                     </div>
                     <div class="formbold-mb-5">
                         <label for="Maître d’Ouvrage" class="formbold-form-label">Maître d’Ouvrage :</label>
@@ -132,7 +129,7 @@
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5 w-full">
                                 <label for="Date début de travaux" class="formbold-form-label">Date début de travaux :</label>
-                                <input type="date"name="Date début de travaux"id="Date début de travaux"class="formbold-form-input"/>
+                                <input type="date"name="Date début de travaux"id="Date début de travaux" class="formbold-form-input"/>
                             </div>
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">

@@ -1,18 +1,21 @@
-document.getElementById("autre").addEventListener("change", function() {
-    if (this.checked) {
-      document.getElementById("autreText").style.display = "block";
-    }
+for (let i = 1; i <= 3; i++) {
+  document.querySelector(`input[name="typeVisite${i}"][value="autre"]`).addEventListener("change", function() {
+      if (this.checked) {
+          document.getElementById("autreText" + i).style.display = "block";
+      }
   });
-  
-  document.getElementById("reunion").addEventListener("change", function() {
-    if (this.checked) {
-      document.getElementById("autreText").style.display = "none";
-    }
+
+  document.querySelector(`input[name="typeVisite${i}"][value="reunion"]`).addEventListener("change", function() {
+      if (this.checked) {
+          document.getElementById("autreText" + i).style.display = "none";
+      }
   });
-  
-  document.getElementById("visiteInopinee").addEventListener("change", function() {
+
+  document.querySelector(`input[name="typeVisite${i}"][value="visite Inopinee"]`).addEventListener("change", function() {
     if (this.checked) {
-      document.getElementById("autreText").style.display = "none";
+        document.getElementById("autreText" + i).style.display = "none";
     }
-  });
+});
+
   
+}

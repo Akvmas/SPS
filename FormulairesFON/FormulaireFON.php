@@ -35,16 +35,6 @@
             </div>
           </div>
         </div>
-        <label>Type de visite:</label>
-        <div class="radio-buttons">
-          <label for="reunion"><input type="radio" id="reunion" name="typeVisite" value="reunion">Réunion</label>
-          <label for="visiteInopinee"><input type="radio" id="visiteInopinee" name="typeVisite" value="visiteInopinee">Visite inopinée</label>
-          <label for="autre"><input type="radio" id="autre" name="typeVisite" value="autre">Autre</label>
-        </div>
-        <div class="input-group" id="autreText" style="display: none;">
-          <label for="autreDescription">Précisez:</label>
-          <input type="text" name="autreDescription" id="autreDescription">
-        </div>
       </div>
       <div class="text-divider"></div>
       <div class="part-two">
@@ -55,12 +45,22 @@
         </div>
         <br>
         <div id="observation1" class="tab-content" style="display: block;">
+          <label>Type de visite:</label>
+          <div class="radio-buttons">
+            <label for="reunion"><input type="radio" id="reunion1" name="typeVisite1" value="reunion">Réunion</label>
+            <label for="visiteInopinee"><input type="radio" id="visiteInopinee1" name="typeVisite1" value="visiteInopinee">Visite inopinée</label>
+            <label for="autre"><input type="radio" id="autre1" name="typeVisite1" value="autre">Autre</label>
+          </div>
+          <div class="input-group" id="autreText1" style="display: none;">
+            <label for="autreDescription">Précisez:</label>
+            <input type="text" name="autreDescription1" id="autreDescription1">
+          </div>
           <label>Date:</label>
           <input type="date" name="date1" id="date1"  >
           <label>Heure:</label>
           <input type="time" name="heure1" id="heure1"  >
           <br>
-          <textarea name="observation1" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."  ></textarea>
+          <textarea type="text" name="observation1" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."  ></textarea>
           <br>
           <input type="file" name="photos1[]" accept="image/*" multiple>
           <br>
@@ -72,6 +72,16 @@
           <br>
         </div>
         <div id="observation2" class="tab-content">
+          <label>Type de visite:</label>
+            <div class="radio-buttons">
+              <label for="reunion"><input type="radio" id="reunion2" name="typeVisite2" value="reunion">Réunion</label>
+              <label for="visiteInopinee"><input type="radio" id="visiteInopinee2" name="typeVisite2" value="visiteInopinee">Visite inopinée</label>
+              <label for="autre"><input type="radio" id="autre2" name="typeVisite2" value="autre">Autre</label>
+          </div>
+          <div class="input-group" id="autreText2" style="display: none;">
+              <label for="autreDescription">Précisez:</label>
+              <input type="text" name="autreDescription2" id="autreDescription2">
+          </div>
           <label>Date:</label>
           <input type="date" name="date2" id="date2"  >
           <label>Heure:</label>
@@ -89,6 +99,17 @@
           <br>
         </div>
         <div id="observation3" class="tab-content">
+          <label>Type de visite:</label>
+          <div class="radio-buttons">
+          <label for="reunion"><input type="radio" id="reunion1" name="typeVisite1" value="reunion">Réunion</label>
+          <label for="visiteInopinee"><input type="radio" id="visiteInopinee1" name="typeVisite1" value="visite Inopinee">Visite inopinée</label>
+          <label for="autre"><input type="radio" id="autre1" name="typeVisite1" value="autre">Autre</label>
+</div>
+
+          <div class="input-group" id="autreText3" style="display: none;">
+            <label for="autreDescription">Précisez:</label>
+            <input type="text" name="autreDescription3" id="autreDescription3">
+          </div>
           <label>Date:</label>
           <input type="date" name="date3" id="date3"  >
           <label>Heure:</label>
@@ -105,8 +126,7 @@
           <input type="text" name="effectif3" id="effectif3">
           <br>
         </div>
-        <br>
-        
+        <br>  
       </div>
       <div class="text-divider"></div>
       <p>Sans remarque de la part de l’entreprise dans un délai de 8 jours, les observations formulées par le Coordonnateur S.P.S. sont réputées acceptées sans réserve.</p>
@@ -116,16 +136,6 @@
           <input type="text" name="coordonnateurSPS_copy" id="coordonnateurSPS_copy" Value="Gaël MONGARS">
           <label for="signature">Signature:</label>
           <img src="../images/signature.png" width="220" height="100">
-        </div>
-        <div class="column2">
-          <label for="copie">Copie à:</label>
-          <div class="radio-buttons">
-            <label for="maitreOuvrage"><input type="radio" id="maitreOuvrage" name="copie" value="MaitreOuvrage">Maître d’Ouvrage</label>
-            <label for="maitreOeuvre"><input type="radio" id="maitreOeuvre" name="copie" value="MaitreOeuvre">Maître d’Œuvre</label>
-            <label for="direccte"><input type="radio" id="direccte" name="copie" value="Direccte">D.I.R.E.C.C.T.E.</label>
-            <label for="carsat"><input type="radio" id="carsat" name="copie" value="Carsat">C.A.R.S.A.T.</label>
-            <label for="oppbtp"><input type="radio" id="oppbtp" name="copie" value="Oppbtp">O.P.P.B.T.P.</label>
-          </div>
         </div>
       </div>
       <input type="submit" value="Upload">

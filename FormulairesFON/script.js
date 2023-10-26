@@ -4,11 +4,13 @@ var companyValues = [];
 var effectiveValues = [];
 
 window.onload = function() {
-    ["autre", "reunion", "visiteInopinee"].forEach(function(id) {
-        document.getElementById(id).addEventListener("change", function() {
-            document.getElementById("autreText").style.display = this.checked && id == "autre" ? "block" : "none";
+    for (let i = 1; i <= 3; i++) {
+        ["autre", "reunion", "visite Inopinee"].forEach(function(type) {
+            document.getElementById(type + i).addEventListener("change", function() {
+                document.getElementById("autreText" + i).style.display = this.checked && type == "autre" ? "block" : "none";
+            });
         });
-    });
+    }
 
     document.getElementById('myForm').addEventListener('submit', function(event) {
         if (!validateForm()) {
@@ -17,11 +19,21 @@ window.onload = function() {
     });
 
     document.querySelector('form').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && e.target.tagName.toLowerCase() !== 'textarea') {
             e.preventDefault();
         }
     });
+    
+    $(document).ready(function() {
+        $('form input, form textarea').on('keypress', function(e) {
+            if (e.which === 13 && e.target.tagName.toLowerCase() !== 'textarea') {
+                return false;
+            }
+        });
+    });
+    
 }
+
 
 function validateForm() {
   companyValues = [];
