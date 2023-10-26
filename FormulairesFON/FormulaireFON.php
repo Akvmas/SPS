@@ -35,12 +35,6 @@
             </div>
           </div>
         </div>
-        <div class="input-group">
-          <label>Date:</label>
-          <input type="date" name="date" id="date"  >
-          <label>Heure:</label>
-          <input type="time" name="heure" id="heure"  >
-        </div>
         <label>Type de visite:</label>
         <div class="radio-buttons">
           <label for="reunion"><input type="radio" id="reunion" name="typeVisite" value="reunion">Réunion</label>
@@ -61,9 +55,14 @@
         </div>
         <br>
         <div id="observation1" class="tab-content" style="display: block;">
+          <label>Date:</label>
+          <input type="date" name="date1" id="date1"  >
+          <label>Heure:</label>
+          <input type="time" name="heure1" id="heure1"  >
+          <br>
           <textarea name="observation1" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."  ></textarea>
           <br>
-          <input type="file" name="photo1" accept="image/*"  >
+          <input type="file" name="photos1[]" accept="image/*" multiple>
           <br>
           <label for="entreprise1">Entreprise:</label>
           <input type="text" name="entreprise1" id="entreprise1"  >
@@ -73,9 +72,14 @@
           <br>
         </div>
         <div id="observation2" class="tab-content">
+          <label>Date:</label>
+          <input type="date" name="date2" id="date2"  >
+          <label>Heure:</label>
+          <input type="time" name="heure2" id="heure2"  >
+          <br>
           <textarea name="observation2" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."></textarea>
           <br>
-          <input type="file" name="photo2" accept="image/*">
+          <input type="file" name="photos2[]" accept="image/*" multiple>
           <br>
           <label for="entreprise2">Entreprise:</label>
           <input type="text" name="entreprise2" id="entreprise2">
@@ -85,9 +89,14 @@
           <br>
         </div>
         <div id="observation3" class="tab-content">
+          <label>Date:</label>
+          <input type="date" name="date3" id="date3"  >
+          <label>Heure:</label>
+          <input type="time" name="heure3" id="heure3"  >
+          <br>
           <textarea name="observation3" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."></textarea>
           <br>
-          <input type="file" name="photo3" accept="image/*">
+          <input type="file" name="photos3[]" accept="image/*" multiple>
           <br>
           <label for="entreprise3">Entreprise:</label>
           <input type="text" name="entreprise3" id="entreprise3">
