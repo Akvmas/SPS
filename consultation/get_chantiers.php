@@ -29,4 +29,3 @@ $_SESSION['observations'] = $result_observations;
 
 // Redirection vers la page du formulaire avec l'ID du chantier en paramètre d'URL
 header("Location: FonConsultations.php?chantier_id=".$chantier_id);
-?>

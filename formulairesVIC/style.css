@@ -1,147 +1,168 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  body {
-    font-family: "Inter", Arial, Helvetica, sans-serif;
-  }
-  .formbold-mb-5 {
-    margin-bottom: 20px;
-  }
-  .formbold-pt-3 {
-    padding-top: 12px;
-  }
-  .formbold-main-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 48px;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  .formbold-form-wrapper {
-    margin: 0 auto;
-    max-width: 550px;
-    width: 100%;
-    background: white;
-  }
-  .formbold-form-label {
-    display: block;
-    font-weight: 500;
-    font-size: 16px;
-    color: #07074d;
-    margin-bottom: 12px;
-  }
-  .formbold-form-label-2 {
-    font-weight: 600;
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
+body {
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+}
 
-  .formbold-form-input {
-    width: 100%;
-    padding: 12px 24px;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
-    background: white;
-    font-weight: 500;
-    font-size: 16px;
-    color: #6b7280;
-    outline: none;
-    resize: none;
-  }
-  .formbold-form-input:focus {
-    border-color: #6a64f1;
-    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
-  }
+.formbold-mb-5 {
+  margin-bottom: 20px;
+}
 
-  .formbold-btn {
-    text-align: center;
-    font-size: 16px;
-    border-radius: 6px;
-    padding: 14px 32px;
-    border: none;
-    font-weight: 600;
-    background-color: #6a64f1;
-    color: white;
-    width: 100%;
-    cursor: pointer;
-  }
-  .formbold-btn:hover {
-    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
-  }
+.formbold-pt-3 {
+  padding-top: 12px;
+}
 
-  .formbold--mx-3 {
-    margin-left: -12px;
-    margin-right: -12px;
-  }
-  .formbold-px-3 {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-  .flex {
-    display: flex;
-  }
-  .flex-wrap {
-    flex-wrap: wrap;
-  }
-  .w-full {
-    width: 100%;
-  }
-  @media (min-width: 540px) {
-    .sm\:w-half {
-      width: 50%;
-    }
-  }
-  fieldset {
-    min-width: 50;
-    padding: 50px;
-    margin: 5 0px;
-    border: auto; }
+.formbold-main-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
 
-  body, canvas, div, form, input {
-    margin: 0;
-    padding: 0;
+.formbold-form-wrapper {
+  margin: 0 auto;
+  max-width: 550px;
+  width: 100%;
+  background: white;
+}
+
+.formbold-form-label {
+  display: block;
+  font-weight: 500;
+  font-size: 16px;
+  color: #07074d;
+  margin-bottom: 12px;
+}
+
+.formbold-form-label-2 {
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.formbold-form-input {
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  font-weight: 500;
+  font-size: 16px;
+  color: #6b7280;
+  outline: none;
+  resize: none;
+}
+
+.formbold-form-input:focus {
+  border-color: #6a64f1;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.formbold-btn {
+  text-align: center;
+  font-size: 16px;
+  border-radius: 6px;
+  padding: 14px 32px;
+  border: none;
+  font-weight: 600;
+  background-color: #6a64f1;
+  color: white;
+  width: 100%;
+  cursor: pointer;
+}
+
+.formbold-btn:hover {
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.formbold--mx-3 {
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+.formbold-px-3 {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.w-full {
+  width: 100%;
+}
+
+@media (min-width: 540px) {
+  .sm\:w-half {
+    width: 50%;
   }
-  .wrapper {
-    position: relative;
-    width: 400px;
-    height: 200px;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-  
-  .signature-pad {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width:400px;
-    height:200px;
-    background-color: white;
-  }
-  #sig-canvas {
-    border: 2px dotted #CCCCCC;
-    border-radius: 15px;
-    cursor: crosshair;
-  }
-  #popup {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    padding-top: 100px;
+}
+
+fieldset {
+  min-width: 50;
+  padding: 50px;
+  margin: 5 0px;
+  border: auto;
+}
+
+body,
+canvas,
+div,
+form,
+input {
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper {
+  position: relative;
+  width: 400px;
+  height: 200px;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.signature-pad {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 400px;
+  height: 200px;
+  background-color: white;
+}
+
+#sig-canvas {
+  border: 2px dotted #CCCCCC;
+  border-radius: 15px;
+  cursor: crosshair;
+}
+
+#popup {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  padding-top: 100px;
 }
 
 .container {
-    background: white;
-    margin: auto;
-    padding: 20px;
-    width: 80%;
-    box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.5);
+  background: white;
+  margin: auto;
+  padding: 20px;
+  width: 80%;
+  box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
 }
-

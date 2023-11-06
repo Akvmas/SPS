@@ -13,6 +13,3 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 foreach ($results as $row) {
     echo "<option value='" . $row["id"] . "'>" . $row["description"] . "</option>";
 }
-
-
-?>

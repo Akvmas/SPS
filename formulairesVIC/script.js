@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     var signButton = document.getElementById('signer-button');
     var saveButton = document.getElementById('sig-saveBtn');
     var clearButton = document.getElementById('sig-clearBtn');
@@ -8,12 +8,12 @@ document.addEventListener("DOMContentLoaded", function() {
     var previewImage = document.getElementById('signature-preview');
     var signaturePad;
 
-    signButton.addEventListener("click", function() {
+    signButton.addEventListener("click", function () {
         popupDiv.style.display = 'block';
         signaturePad = new SignaturePad(canvas);
     });
 
-    saveButton.addEventListener("click", function() {
+    saveButton.addEventListener("click", function () {
         if (!signaturePad.isEmpty()) {
             var signatureDataURL = signaturePad.toDataURL();
             signatureDataField.value = signatureDataURL;
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    clearButton.addEventListener("click", function() {
+    clearButton.addEventListener("click", function () {
         signaturePad.clear();
     });
 });

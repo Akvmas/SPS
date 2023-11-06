@@ -36,8 +36,9 @@ for ($i = 1; $i <= 3; $i++) {
     <form id="myForm" action="process.php" method="POST" enctype="multipart/form-data">
       <div class="part-one">
         <div class="input-group">
+          <textarea hidden name="chantier_id" id="chantier_id" rows="2" cols="50"><?= $chantier_id ?></textarea>
           <label for="chantier">Chantier:</label>
-          <textarea name="chantier" id="chantier" rows="2" cols="50"><?= $chantier['description'] ?></textarea>
+          <textarea name="chantierNom" id="chantierNom" rows="2" cols="50"><?= $chantier['description'] ?></textarea>
         </div>
         <div class="input-group">
           <label for="maitreOuvrage">Maître d'Ouvrage:</label>
@@ -101,6 +102,7 @@ for ($i = 1; $i <= 3; $i++) {
           <br>
         </div>
         <div id="observation2" class="tab-content">
+          <input type="text" name="valueobs" id="valueobs" Value="<?= $observations[2] ?>">
           <label>Type de visite:</label>
           <div class="radio-buttons">
             <label for="reunion">
@@ -137,10 +139,8 @@ for ($i = 1; $i <= 3; $i++) {
           <div class="radio-buttons">
             <label for="reunion">
               <input type="radio" id="reunion3" name="typeVisite3" value="reunion" <?php echo (isset($observations[3]['typeVisite']) && $observations[3]['typeVisite'] == 'reunion') ? 'checked' : ''; ?>>Réunion</label>
-
             <label for="visiteInopinee">
               <input type="radio" id="visiteInopinee3" name="typeVisite3" value="visiteInopinee" <?php echo (isset($observations[3]['typeVisite']) && $observations[3]['typeVisite'] == 'visiteInopinee') ? 'checked' : ''; ?>>Visite inopinée</label>
-
             <label for="autre">
               <input type="radio" id="autre3" name="typeVisite3" value="autre" <?php echo (isset($observations[3]['typeVisite']) && $observations[3]['typeVisite'] == 'autre') ? 'checked' : ''; ?>>Autre</label>
           </div>
