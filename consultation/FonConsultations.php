@@ -17,7 +17,7 @@ $personnes = $stmt->fetchAll();
 // Récupérer les observations
 $observations = [];
 for ($i = 1; $i <= 3; $i++) {
-  $stmt = $pdo->prepare("SELECT * FROM `observations` WHERE `chantier_id` = :chantier_id AND `observation_number` = :obs_number");
+  $stmt = $pdo->prepare("SELECT *, TO_BASE64(photo) AS photo_base64 FROM `observations` WHERE `chantier_id` = :chantier_id AND `observation_number` = :obs_number");
   $stmt->execute(['chantier_id' => $chantier_id, 'obs_number' => $i]);
   $observations[$i] = $stmt->fetch();
 }
@@ -93,6 +93,11 @@ for ($i = 1; $i <= 3; $i++) {
           <label>Heure:</label>
           <input type="time" name="heure1" id="heure1" value="<?php echo $observations[1]['heure']; ?>">
           <br>
+          <?php if ($observations[1] && $observations[1]['photo']) : ?>
+            <img src="data:image/jpeg;base64,<?= base64_encode($observations[1]['photo']) ?>" alt="Photo d'observation 1" />
+          <?php else : ?>
+            <input type="file" name="photo1" accept="image/*">
+          <?php endif; ?>
           <textarea name="observation1" rows="5" cols="50" maxlength="1000"><?php echo $observations[1]['texte']; ?></textarea>
           <label for="entreprise1">Entreprise:</label>
           <input type="text" name="entreprise1" id="entreprise1" value="<?php echo $observations[1]['entreprise']; ?>">
@@ -102,7 +107,6 @@ for ($i = 1; $i <= 3; $i++) {
           <br>
         </div>
         <div id="observation2" class="tab-content">
-          <input type="text" name="valueobs" id="valueobs" Value="<?= $observations[2] ?>">
           <label>Type de visite:</label>
           <div class="radio-buttons">
             <label for="reunion">
@@ -124,9 +128,11 @@ for ($i = 1; $i <= 3; $i++) {
           <input type="time" name="heure2" id="heure2" value="<?php echo isset($observations[2]['heure']) ? $observations[2]['heure'] : ''; ?>">
           <br>
           <textarea name="observation2" rows="5" cols="50" maxlength="1000"><?php echo isset($observations[2]['texte']) ? $observations[2]['texte'] : ''; ?></textarea>
-          <br>
-          <input type="file" name="photos2[]" accept="image/*" multiple>
-          <br>
+          <?php if ($observations[2] && $observations[2]['photo']) : ?>
+            <img src="data:image/jpeg;base64,<?= base64_encode($observations[2]['photo']) ?>" alt="Photo d'observation 2" />
+          <?php else : ?>
+            <input type="file" name="photo2" accept="image/*">
+          <?php endif; ?>
           <label for="entreprise2">Entreprise:</label>
           <input type="text" name="entreprise2" id="entreprise2" value="<?php echo isset($observations[2]['entreprise']) ? $observations[2]['entreprise'] : ''; ?>">
           <br>
@@ -155,8 +161,11 @@ for ($i = 1; $i <= 3; $i++) {
           <br>
           <textarea name="observation3" rows="5" cols="50" maxlength="1000"><?php echo isset($observations[3]['texte']) ? $observations[3]['texte'] : ''; ?></textarea>
           <br>
-          <input type="file" name="photos3[]" accept="image/*" multiple>
-          <br>
+          <?php if ($observations[3] && $observations[3]['photo']) : ?>
+            <img src="data:image/jpeg;base64,<?= base64_encode($observations[3]['photo']) ?>" alt="Photo d'observation 3" />
+          <?php else : ?>
+            <input type="file" name="photo3" accept="image/*">
+          <?php endif; ?>
           <label for="entreprise3">Entreprise:</label>
           <input type="text" name="entreprise3" id="entreprise3" value="<?php echo isset($observations[3]['entreprise']) ? $observations[3]['entreprise'] : ''; ?>">
           <br>

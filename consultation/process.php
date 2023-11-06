@@ -9,9 +9,10 @@ global $pdo;
 $chantierId = $_POST['chantier_id'];
 
 
-function updateFormData($postData, $fileData) {
+function updateFormData($postData, $fileData)
+{
     global $pdo;
-    if (!isset($_POST['chantier_id'])) {
+    if (!isset($postData['chantier_id'])) {
         die("L'ID du chantier est manquant.");
     }
     $chantierId = $postData['chantier_id'];
@@ -28,17 +29,17 @@ function updateFormData($postData, $fileData) {
         $typeVisite = $postData['typeVisite' . $obsIndex] ?? null;
         $autreDescription = $postData['autreDescription' . $obsIndex] ?? null;
         $date = $postData['date' . $obsIndex] ?? null;
-$formattedDate = null; // Initialiser à null
+        $formattedDate = null; // Initialiser à null
 
-// Valider la date seulement si elle n'est pas vide
-if (!empty($date)) {
-    $dateObject = DateTime::createFromFormat('Y-m-d', $date);
-    if ($dateObject) {
-        $formattedDate = $dateObject->format('Y-m-d');
-    } else {
-        die("Le format de la date pour l'observation $obsIndex est invalide.");
-    }
-}
+        // Valider la date seulement si elle n'est pas vide
+        if (!empty($date)) {
+            $dateObject = DateTime::createFromFormat('Y-m-d', $date);
+            if ($dateObject) {
+                $formattedDate = $dateObject->format('Y-m-d');
+            } else {
+                die("Le format de la date pour l'observation $obsIndex est invalide.");
+            }
+        }
         $heure = $postData['heure' . $obsIndex] ?? null;
 
         // VÃ©rification si l'observation existe dÃ©jÃ 
@@ -46,40 +47,49 @@ if (!empty($date)) {
         $stmt_check->execute([$chantierId, $obsIndex]);
 
         $photo = null;
-        if (isset($fileData['photos' . $obsIndex]) && $fileData['photos' . $obsIndex]['error'] == 0) {
-            $photo = file_get_contents($fileData['photos' . $obsIndex]['tmp_name']);
+        $photoColumnName = 'photo' . $obsIndex;
+        if (isset($fileData[$photoColumnName]) && $fileData[$photoColumnName]['error'] == 0) {
+            // Nouvelle photo fournie, elle remplacera l'ancienne
+            $photo = file_get_contents($fileData[$photoColumnName]['tmp_name']);
+        } else {
+            // Aucune nouvelle photo fournie, nous garderons l'ancienne
+            if ($row = $stmt_check->fetch()) {
+                $photo = $row['photo']; // Conserver la photo existante
+            }
         }
 
         if ($row = $stmt_check->fetch()) {
-            // Mise Ã  jour de l'observation existante
-            $stmt = $pdo->prepare("UPDATE observations SET chantier_id =?, texte = ?, photo = ?, entreprise = ?, effectif = ?, typeVisite = ?, autreDescription = ?, date = ?, heure = ? WHERE observation_id = ?");
-            $stmt->execute([$chantierId, $observationText, $photo, $entreprise, $effectif, $typeVisite, $autreDescription, $formattedDate, $heure, $row['observation_id']]);
+            // Mise à jour de l'observation existante
+            $stmt = $pdo->prepare("UPDATE observations SET texte = COALESCE(?, texte), photo = COALESCE(?, photo), entreprise = COALESCE(?, entreprise), effectif = COALESCE(?, effectif), typeVisite = COALESCE(?, typeVisite), autreDescription = COALESCE(?, autreDescription), date = COALESCE(?, date), heure = COALESCE(?, heure) WHERE chantier_id = ? AND observation_number = ?");
+            $stmt->execute([$observationText, $photo, $entreprise, $effectif, $typeVisite, $autreDescription, $formattedDate, $heure, $chantierId, $obsIndex]);
         } else {
             // Insertion d'une nouvelle observation
             $stmt = $pdo->prepare("INSERT INTO observations (chantier_id, texte, photo, entreprise, effectif, observation_number, typeVisite, autreDescription, date, heure) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$chantierId, $observationText, $photo, $entreprise, $effectif, $obsIndex, $typeVisite, $autreDescription, $formattedDate, $heure]);
         }
-        
     }
 
     return true;
 }
 
-function clean_input($data) {
+function clean_input($data)
+{
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
     return $data;
 }
 
-function isValidImage($blob) {
+function isValidImage($blob)
+{
     $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->buffer($blob);
     return in_array($mime, $allowedMimes);
 }
 
-function getImagePathsForObservation($chantierId, $observationNumber) {
+function getImagePathsForObservation($chantierId, $observationNumber)
+{
     global $pdo;
 
     $stmt = $pdo->prepare("SELECT photo FROM observations WHERE chantier_id = ? AND observation_number = ?");
@@ -112,7 +122,8 @@ function getImagePathsForObservation($chantierId, $observationNumber) {
     return $imagePaths;
 }
 
-function getImageFromDatabase($chantierId) {
+function getImageFromDatabase($chantierId)
+{
     global $pdo;
 
     $stmt = $pdo->prepare("SELECT photo FROM observations WHERE chantier_id = ?");
@@ -121,14 +132,17 @@ function getImageFromDatabase($chantierId) {
     return $stmt->fetchColumn();
 }
 
-class MYPDF extends TCPDF {
-    public function Header() {
+class MYPDF extends TCPDF
+{
+    public function Header()
+    {
         $this->SetFont('helvetica', 'B', 20);
         $this->Image('../images/imgpreview.jpg', 10, 10, 33, 0, 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
         $this->Cell(0, 15, "Fiche d'observation ou de notification ", 0, false, 'C', 0, '', 0, false, 'M', 'M');
     }
 
-    public function Footer() {
+    public function Footer()
+    {
         $this->SetY(-15);
         $this->SetFont('helvetica', 'I', 8);
         $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
@@ -197,7 +211,7 @@ function generatePdf($postData, $chantierId)
 
     $i = 1;
     while (isset($postData["observation{$i}"]) && !empty($postData["observation{$i}"])) {
-        $pdf->Cell(0, 0, 'Observation NÂ°' . $i . ': ' . clean_input($postData["observation{$i}"]), 0, 1, '');
+        $pdf->MultiCell(0, 10, 'Observation ' . $i . ': ' . clean_input($postData["observation{$i}"]), 0, 'L');
 
         $imageFilePaths = getImagePathsForObservation($chantierId, $i);
 
@@ -263,14 +277,9 @@ echo "PDF gÃ©nÃ©rÃ©: " . $pdfFilename;
 // Logique principale
 $result = updateFormData($_POST, $_FILES);
 if (!$result) {
-    die("Une erreur s'est produite lors de l'enregistrement des donnÃ©es du formulaire.");
+    die("Une erreur s'est produite lors de l'enregistrement des données du formulaire.");
 }
 
-$pdfFilename = generatePdf($_POST, $_FILES);
-if (!$pdfFilename) {
-    die("Une erreur s'est produite lors de la gÃ©nÃ©ration du PDF.");
-}
-
-$_SESSION['pdfFilename'] = $pdfFilename;
-header("Location: ../mail/pageMail.php");
-die;
+// Redirection vers la page de succès avec le chemin du PDF généré
+header("Location: ../mail/pageMail.php?pdf=" . urlencode($pdfFilename));
+exit;
