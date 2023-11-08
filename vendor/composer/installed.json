@@ -795,17 +795,17 @@
         },
         {
             "name": "nunomaduro/phpinsights",
-            "version": "v2.8.0",
-            "version_normalized": "2.8.0.0",
+            "version": "v2.9.0",
+            "version_normalized": "2.9.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/phpinsights.git",
-                "reference": "a701b7acfda9940ef0140c7276319df9026824c4"
+                "reference": "52d69d895239b1e9a90d7212dffc6c7e73ec822e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/phpinsights/zipball/a701b7acfda9940ef0140c7276319df9026824c4",
-                "reference": "a701b7acfda9940ef0140c7276319df9026824c4",
+                "url": "https://api.github.com/repos/nunomaduro/phpinsights/zipball/52d69d895239b1e9a90d7212dffc6c7e73ec822e",
+                "reference": "52d69d895239b1e9a90d7212dffc6c7e73ec822e",
                 "shasum": ""
             },
             "require": {
@@ -823,8 +823,8 @@
                 "psr/container": "^1.0|^2.0",
                 "psr/simple-cache": "^1.0|^2.0|^3.0",
                 "sebastian/diff": "^4.0|^5.0",
-                "slevomat/coding-standard": "^7.0.8|^8.0",
-                "squizlabs/php_codesniffer": "^3.5",
+                "slevomat/coding-standard": "^8.13",
+                "squizlabs/php_codesniffer": "^3.7",
                 "symfony/cache": "^4.4|^5.0|^6.0",
                 "symfony/console": "^4.2.12|^5.0|^6.0",
                 "symfony/finder": "^4.2.12|^5.0|^6.0",
@@ -845,7 +845,7 @@
             "suggest": {
                 "ext-simplexml": "It is needed for the checkstyle formatter"
             },
-            "time": "2023-03-18T18:38:03+00:00",
+            "time": "2023-10-20T15:58:50+00:00",
             "bin": [
                 "bin/phpinsights"
             ],
@@ -884,7 +884,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nunomaduro/phpinsights/issues",
-                "source": "https://github.com/nunomaduro/phpinsights/tree/v2.8.0"
+                "source": "https://github.com/nunomaduro/phpinsights/tree/v2.9.0"
             },
             "funding": [
                 {
@@ -3704,17 +3704,17 @@
         },
         {
             "name": "tecnickcom/tc-lib-pdf",
-            "version": "8.0.22",
-            "version_normalized": "8.0.22.0",
+            "version": "8.0.26",
+            "version_normalized": "8.0.26.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-pdf.git",
-                "reference": "bb1626e842efa7c8d0fda74613bc40d25425b007"
+                "reference": "57866dab3e348633d35092712ecaa57f13b52017"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf/zipball/bb1626e842efa7c8d0fda74613bc40d25425b007",
-                "reference": "bb1626e842efa7c8d0fda74613bc40d25425b007",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf/zipball/57866dab3e348633d35092712ecaa57f13b52017",
+                "reference": "57866dab3e348633d35092712ecaa57f13b52017",
                 "shasum": ""
             },
             "require": {
@@ -3740,7 +3740,7 @@
                 "sebastian/phpcpd": "6.0.3 || 5.0.2 || 4.1.0 || 3.0.1 || 2.0.4",
                 "squizlabs/php_codesniffer": "3.7.2 || 2.9.2"
             },
-            "time": "2023-05-18T08:12:16+00:00",
+            "time": "2023-09-06T13:22:45+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -3750,7 +3750,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-3.0"
+                "LGPL-3.0-or-later"
             ],
             "authors": [
                 {
@@ -3770,7 +3770,7 @@
             ],
             "support": {
                 "issues": "https://github.com/tecnickcom/tc-lib-pdf/issues",
-                "source": "https://github.com/tecnickcom/tc-lib-pdf/tree/8.0.22"
+                "source": "https://github.com/tecnickcom/tc-lib-pdf/tree/8.0.26"
             },
             "funding": [
                 {

@@ -130,15 +130,17 @@ function removeObservation(event) {
       observationCount--;
   }
 }
+let counter = 1; // Assurez-vous que cette variable est globale ou accessible par addInput et removeInput
+
 function addInput(divName, event) {
   event.preventDefault();
   var newDiv = document.createElement('div');
   newDiv.className = 'personne-input';
 
-  var newInput = document.createElement('input'); // Créez un élément input
-  newInput.type = 'text'; // Assurez-vous qu'il s'agit d'un champ de texte
-  newInput.name = 'personne' + counter;
-  newInput.id = 'personne' + counter;
+  var newInput = document.createElement('input');
+  newInput.type = 'text';
+  newInput.name = 'personnes_presentes[]'; // Modifié pour utiliser le format de tableau
+  newInput.id = 'personne' + counter; // L'ID peut rester unique pour d'autres usages
   newInput.required = true;
 
   var removeButton = document.createElement('button');
@@ -149,14 +151,14 @@ function addInput(divName, event) {
       removeInput(newDiv, event);
   };
 
-  newDiv.appendChild(newInput); // Ajoutez l'élément input à la div
+  newDiv.appendChild(newInput);
   newDiv.appendChild(removeButton);
 
   document.getElementById(divName).appendChild(newDiv);
   counter++;
 }
 
-function removeInput(element,event) {
+function removeInput(element, event) {
     event.preventDefault();
     element.parentNode.removeChild(element);
 }

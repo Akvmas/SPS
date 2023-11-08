@@ -191,7 +191,7 @@ function generatePdf($postData, $chantierId)
 
     // Add persons
     $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Cell(0, 0, 'Personnes prÃ©sentes:', 0, 1, '');
+    $pdf->Cell(0, 0, 'Personnes presentes:', 0, 1, '');
     $pdf->SetFont('helvetica', '', 12);
 
     $i = 1;

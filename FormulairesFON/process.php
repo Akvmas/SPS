@@ -90,9 +90,8 @@ function saveFormData($postData, $fileData) {
                 $stmt->execute([$chantierId, $obsIndex, $observation, $photoContent, $entreprise, $effectif, $dateObservation, $heureObservation, $typeVisite, $autreDescription]);
             }
         }
-        if (isset($postData['personnes'])) {
-            foreach ($postData['personnes'] as $index => $personne) {
-                $nom = $personne['nom'] ?? null;
+        if (isset($postData['personnes_presentes'])) {
+            foreach ($postData['personnes_presentes'] as $nom) {
                 if (!empty($nom)) {
                     // Préparez la requête SQL pour insérer la personne présente
                     $stmt = $pdo->prepare("INSERT INTO personnes_presentes (chantier_id, nom) VALUES (?, ?)");

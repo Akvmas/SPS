@@ -31,7 +31,7 @@
           <label>Personnes présentes:</label>
           <div id="dynamicInput">
             <div class="personne-input">
-              <input type="text" name="personne1" id="personne1">
+              <input type="text" name="personnes_presentes" id="personnes_presentes">
               <button type="button" class="remove-button" onclick="removeInput(this,event)">x</button>
               <button type="button" onclick="addInput('dynamicInput',event)">+</button>
             </div>
