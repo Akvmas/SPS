@@ -4,7 +4,7 @@
 session_start();
 // Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
 if (!isset($_SESSION["username"])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 ?>
@@ -62,15 +62,15 @@ if (!isset($_SESSION["username"])) {
                 <br>
                 <div class="formbold-mb-5">
                     <label for="Chantier :" class="formbold-form-label">Chantier :</label>
-                    <textarea type="text" name="Chantier[]" id="Chantier" rows="3" cols="50" maxlength="1000" class="formbold-form-input"></textarea>
+                    <textarea type="text" name="Chantier" id="Chantier" rows="3" cols="50" maxlength="1000" class="formbold-form-input"></textarea>
                 </div>
                 <div class="formbold-mb-5">
                     <label for="Maître d’Ouvrage" class="formbold-form-label">Maître d’Ouvrage :</label>
-                    <input type="text" name="Maître d’Ouvrage[]" id="Maître d’Ouvrage" class="formbold-form-input" value="Eau 17" />
+                    <input type="text" name="Maitre d’Ouvrage" id="Maitre d’Ouvrage" class="formbold-form-input" value="Eau 17" />
                 </div>
                 <div class="formbold-mb-5">
                     <label for="Maître d’Œuvre" class="formbold-form-label">Maître d’Œuvre :</label>
-                    <input type="text" name="Maître d’Œuvre[]" id="Maître d’Œuvre" class="formbold-form-input" />
+                    <input type="text" name="Maitre d’Œuvre" id="Maître d’Œuvre" class="formbold-form-input" />
                 </div>
                 <div class="formbold-mb-5">
                     <label for="Lot concerné " class="formbold-form-label">Lot concerné :</label>
@@ -90,11 +90,11 @@ if (!isset($_SESSION["username"])) {
                 <br>
                 <div class="formbold-mb-5">
                     <label for="Titulaire :" class="formbold-form-label">Titulaire :</label>
-                    <input type="text" name="Titulaire[]" id="Titulaire" class="formbold-form-input" />
+                    <input type="text" name="Titulaire" id="Titulaire" class="formbold-form-input" />
                 </div>
                 <div class="formbold-mb-5">
                     <label for="Sous-Traitant de" class="formbold-form-label">Sous-Traitant de :</label>
-                    <select id="Sous-Traitant de" name="STD[]" class="formbold-form-input">
+                    <select id="Sous-Traitant de" name="Sous-Traitant de[]" class="formbold-form-input">
                         <option value="">Sélectionnez une entreprise</option>
                         <?php
                         $reponse = $bdd->query('SELECT * FROM entreprise ORDER BY Nom');
@@ -110,31 +110,31 @@ if (!isset($_SESSION["username"])) {
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5 w-full">
                             <label for="Date début de travaux" class="formbold-form-label">Date début de travaux :</label>
-                            <input type="date" name="DDT[]" id="Date début de travaux" class="formbold-form-input" />
+                            <input type="date" name="Date début de travaux" id="Date début de travaux" class="formbold-form-input" />
                         </div>
                     </div>
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5">
                             <label for="Date fin des travaux" class="formbold-form-label">Durée de travaux </label>
-                            <input type="text" name="DFT[]" id="Date fin des travaux" class="formbold-form-input" />
+                            <input type="text" name="Date fin des travaux" id="Date fin des travaux" class="formbold-form-input" />
                         </div>
                     </div>
                 </div>
                 <div class="formbold-mb-5">
                     <label for="Travaux sous-traités" class="formbold-form-label"> Travaux sous-traités :</label>
-                    <input type="text" id="Travaux sous-traités" name="TSS[]" class="formbold-form-input" />
+                    <input type="text" id="Travaux sous-traités" name="Travaux sous-traités" class="formbold-form-input" />
                 </div>
                 <div class="flex flex-wrap formbold--mx-3">
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5 w-full">
                             <label for="Effectifs moyens" class="formbold-form-label">Effectifs moyens :</label>
-                            <input type="number" name="EffectifsMoyens[]" id="Effectifs moyens" class="formbold-form-input" />
+                            <input type="number" name="EffectifsMoyens" id="Effectifs moyens" class="formbold-form-input" />
                         </div>
                     </div>
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5">
                             <label for="Effectifs de pointe" class="formbold-form-label">Effectifs de pointe :</label>
-                            <input type="number" name="EDP[]" id="Effectifs de pointe" class="formbold-form-input" />
+                            <input type="number" name="Effectifs de pointe" id="Effectifs de pointe" class="formbold-form-input" />
                         </div>
                     </div>
                 </div>
@@ -176,7 +176,7 @@ if (!isset($_SESSION["username"])) {
                 </div>
                 <div class="formbold-mb-5">
                     <label for="Autres documents" class="formbold-form-label"> Autres documents</label>
-                    <input type="text" id="Autres documents" name="Autres documents[]" class="formbold-form-input" />
+                    <input type="text" id="Autres documents" name="Autres documents" class="formbold-form-input" />
                 </div>
                 <br><strong>Installations de chantier</strong>
                 <br><br>
@@ -198,7 +198,7 @@ if (!isset($_SESSION["username"])) {
                 </div>
                 <div class="formbold-mb-5">
                     <label for="AutresChantier" class="formbold-form-label">Autres :</label>
-                    <input type="text" name="AutresChantier[]" id="AutresChantier" class="formbold-form-input" />
+                    <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
                 </div>
                 <br>Installation hygiène :</br>
                 <br>
@@ -268,7 +268,7 @@ if (!isset($_SESSION["username"])) {
                     </div>
                     <div class="formbold-mb-5 w-full">
                         <label for="Conditions et mode d’approvisionnement" class="formbold-form-label">Conditions et mode d’approvisionnement :</label>
-                        <input type="text" name="Conditions et mode d’approvisionnement[]" id="Conditions et mode d’approvisionnement" class="formbold-form-input" />
+                        <input type="text" name="Conditions et mode d’approvisionnement" id="Conditions et mode d’approvisionnement" class="formbold-form-input" />
                     </div>
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5 w-full">
@@ -283,7 +283,7 @@ if (!isset($_SESSION["username"])) {
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5 w-full">
                             <label for="Contrôle" class="formbold-form-label">Contrôle :</label>
-                            <input type="text" name="Contrôle[]" id="Contrôle" class="formbold-form-input" />
+                            <input type="text" name="Contrôle" id="Contrôle" class="formbold-form-input" />
                         </div>
                     </div>
                     <br>Moyens de secours :</br>
@@ -292,13 +292,13 @@ if (!isset($_SESSION["username"])) {
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5">
                                 <label for="Secouristes" class="formbold-form-label">Secouristes :</label>
-                                <input type="text" name="Secouristes[]" id="Secouristes" class="formbold-form-input" />
+                                <input type="text" name="Secouristes" id="Secouristes" class="formbold-form-input" />
                             </div>
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5">
                                 <label for="Moyens d’alerte" class="formbold-form-label">Moyens d’alerte :</label>
-                                <input type="text" name="Moyens d’alerte[]" id="Moyens d’alerte" class="formbold-form-input" />
+                                <input type="text" name="Moyens d’alerte" id="Moyens d’alerte" class="formbold-form-input" />
                             </div>
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
@@ -350,15 +350,15 @@ if (!isset($_SESSION["username"])) {
                     </div>
                     <div class="formbold-mb-5 w-full">
                         <label for="Circulation" class="formbold-form-label">Circulation :</label>
-                        <input type="text" name="Circulation[]" id="Circulation" class="formbold-form-input" />
+                        <input type="text" name="Circulation" id="Circulation" class="formbold-form-input" />
                     </div>
                     <div class="formbold-mb-5 w-full">
                         <label for="Manœuvre d’engin" class="formbold-form-label">Manœuvre d’engin :</label>
-                        <input type="text" name="Manœuvre d’engin[]" id="Manœuvre d’engin" class="formbold-form-input" />
+                        <input type="text" name="Manœuvre d’engin" id="Manœuvre d’engin" class="formbold-form-input" />
                     </div>
                     <div class="formbold-mb-5 w-full">
-                        <label for="Protections à installer" class="formbold-form-label">Protections à installer :</label>
-                        <input type="text" name="Protections à installer[]" id="Protections à installer" class="formbold-form-input" />
+                        <label for="Protection à installer" class="formbold-form-label">Protection à installer :</label>
+                        <input type="text" name="Protection à installer" id="Protection à installer" class="formbold-form-input" />
                     </div>
                 </div>
                 <br>
@@ -377,11 +377,11 @@ if (!isset($_SESSION["username"])) {
                     </div>
                     <div class="formbold-mb-5 w-full">
                         <label for="Tri des déchets" class="formbold-form-label">Tri des déchets :</label>
-                        <input type="text" name="Tri des déchets[]" id="Tri des déchets" class="formbold-form-input" />
+                        <input type="text" name="Tri des déchets" id="Tri des déchets" class="formbold-form-input" />
                     </div>
                     <div class="formbold-mb-5 w-full">
                         <label for="Autres" class="formbold-form-label">Autres :</label>
-                        <input type="text" name="Autres[]" id="Autres" class="formbold-form-input" />
+                        <input type="text" name="Autres" id="Autres" class="formbold-form-input" />
                     </div>
                 </div>
                 <br>
@@ -425,15 +425,15 @@ if (!isset($_SESSION["username"])) {
                 <br>
                 <div class="formbold-mb-5 ">
                     <label for="Risques exportés" class="formbold-form-label">Risques exportés :</label>
-                    <input type="text" name="Risques exportés[]" id="Risques exportés" class="formbold-form-input" />
+                    <input type="text" name="Risques exportés" id="Risques exportés" class="formbold-form-input" />
                 </div>
                 <div class="formbold-mb-5 ">
                     <label for="Risques importés" class="formbold-form-label">Risques importés :</label>
-                    <input type="text" name="Risques importés[]" id="Risques importés" class="formbold-form-input" />
+                    <input type="text" name="Risques importés" id="Risques importés" class="formbold-form-input" />
                 </div>
                 <div class="formbold-mb-5">
                     <label for="ISDD" class="formbold-form-label">Interventions susceptibles d’être dangereuses :</label>
-                    <select id="ISDD" name="ISDD[]" class="formbold-form-input" multiple multiselect-select-all="true">
+                    <select id="ISDD" name="Interventions susceptibles d’être dangereuses[]" class="formbold-form-input" multiple multiselect-select-all="true">
                         <?php
                         $reponse = $bdd->query('SELECT * FROM interventions ORDER BY Nom');
                         while ($donnees = $reponse->fetch()) {
@@ -446,11 +446,11 @@ if (!isset($_SESSION["username"])) {
                 </div>
                 <div class="formbold-mb-5">
                     <label for="AutresChantier" class="formbold-form-label">Autres* :</label>
-                    <input type="text" name="AutresChantier[]" id="AutresChantier" class="formbold-form-input" />
+                    <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
                 </div>
                 <div class="formbold-mb-5">
                     <label for="PAI" class="formbold-form-label">Protections à installer :</label>
-                    <select id="PAI" name="PAI[]" class="formbold-form-input" multiple multiselect-select-all="true">
+                    <select id="PAI" name="Protections à installer[]" class="formbold-form-input" multiple multiselect-select-all="true">
                         <?php
                         $reponse = $bdd->query('SELECT * FROM protections ORDER BY Nom');
                         while ($donnees = $reponse->fetch()) {
@@ -463,7 +463,7 @@ if (!isset($_SESSION["username"])) {
                 </div>
                 <div class="formbold-mb-5">
                     <label for="AutresChantier" class="formbold-form-label">Autres* :</label>
-                    <input type="text" name="AutresChantier[]" id="AutresChantier" class="formbold-form-input" />
+                    <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
                 </div>
                 <fieldset class="flex flex-wrap formbold--mx-3">
                     <br>
