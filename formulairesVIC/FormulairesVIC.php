@@ -165,12 +165,12 @@ if (!isset($_SESSION["username"])) {
                     </div>
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5 w-full">
-                            PRA (SS3) <input type="checkbox" name="PRA[]" id="PRA" />
+                            PRA (SS3) <input type="checkbox" name="PRA_SS3[]" id="PRA" />
                         </div>
                     </div>
                     <div class="w-full sm:w-half formbold-px-3">
                         <div class="formbold-mb-5 w-full">
-                            MOA (SS4) <input type="checkbox" name="MOA[]" id="MOA" />
+                            MOA (SS4) <input type="checkbox" name="MOA_SS4[]" id="MOA" />
                         </div>
                     </div>
                 </div>
@@ -446,7 +446,7 @@ if (!isset($_SESSION["username"])) {
                 </div>
                 <div class="formbold-mb-5">
                     <label for="AutresChantier" class="formbold-form-label">Autres* :</label>
-                    <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
+                    <input type="text" name="AutresChantier1" id="AutresChantier" class="formbold-form-input" />
                 </div>
                 <div class="formbold-mb-5">
                     <label for="PAI" class="formbold-form-label">Protections à installer :</label>
@@ -463,15 +463,15 @@ if (!isset($_SESSION["username"])) {
                 </div>
                 <div class="formbold-mb-5">
                     <label for="AutresChantier" class="formbold-form-label">Autres* :</label>
-                    <input type="text" name="AutresChantier" id="AutresChantier" class="formbold-form-input" />
+                    <input type="text" name="AutresChantier2" id="AutresChantier" class="formbold-form-input" />
                 </div>
                 <fieldset class="flex flex-wrap formbold--mx-3">
                     <br>
                     <h3>Visite du site faite ce jour pour analyse des conditions d’exécution des travaux</h3>
                     <div class="flex flex-wrap formbold--mx-3">
                         <div class="w-full sm:w-half formbold-px-3">
-                            <br>Entreprise <input type="textarea" name="Titulaire" id="Titulaire" value="" /><br>
-                            Nom <input type="text" name="Nom" id="Nom" /><br>
+                            <br>Entreprise <input type="textarea" name="EntrepriseSignature[]" id="EntrepriseSignature" value="" /><br>
+                            Nom <input type="text" name="Nom1" id="Nom" /><br>
                             Date : <label for="Date" id="current_date2" />
                             <script>
                                 date = new Date();
@@ -480,13 +480,13 @@ if (!isset($_SESSION["username"])) {
                                 day = date.getDate();
                                 document.getElementById("current_date2").innerHTML = day + "/" + month + "/" + year;
                             </script>
-                            <img id="signature-preview" src="" alt="Votre Signature" width="220" height="100" style="border: 1px solid black;">
+                            <img id="signature-preview" src="signatureDataURL" alt="Signature Preview" style="display: none;" />
                         </div>
                         <div class="w-full sm:w-half formbold-px-3">
                             <div class="formbold-mb-5">
                                 <br>coordonnateur S.P.S
                                 <br>
-                                Nom <input type="text" name="Nom" id="Nom" value="MONGARS Gaël" /><br>
+                                Nom <input type="text" name="Nom2" id="Nom" value="MONGARS Gaël" /><br>
                                 Date : <label for="Date" id="current_date3" />
                                 <script>
                                     date = new Date();
@@ -514,7 +514,7 @@ if (!isset($_SESSION["username"])) {
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" id="signature-data" name="signatureData">
+                        <input type="hidden" name="signatureData" id="signature-data">
                     </div>
                 </fieldset>
                 <input type="submit" value="Upload">

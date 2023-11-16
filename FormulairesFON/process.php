@@ -3,6 +3,7 @@
 include '../config.php';
 require('../vendor/autoload.php');
 ini_set('memory_limit', '500M');
+error_reporting(E_ALL);
 session_start();
 
 global $pdo;
@@ -90,8 +91,8 @@ function saveFormData($postData, $fileData) {
                 $stmt->execute([$chantierId, $obsIndex, $observation, $photoContent, $entreprise, $effectif, $dateObservation, $heureObservation, $typeVisite, $autreDescription]);
             }
         }
-        if (isset($postData['personnes_presentes'])) {
-            foreach ($postData['personnes_presentes'] as $nom) {
+        if (isset($postData['personne'])) {
+            foreach ($postData['personne'] as $nom) {
                 if (!empty($nom)) {
                     // Préparez la requête SQL pour insérer la personne présente
                     $stmt = $pdo->prepare("INSERT INTO personnes_presentes (chantier_id, nom) VALUES (?, ?)");
@@ -288,6 +289,5 @@ echo "PDF généré: " . $pdfFilename;
 $_SESSION['pdfFilename'] = $pdfFilename;
 
 // Rediriger l'utilisateur vers la page d'envoi de l'e-mail
-header("Location: ../mail/pageMail.php");
 die;
 ?>

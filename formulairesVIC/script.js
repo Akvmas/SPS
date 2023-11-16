@@ -5,28 +5,28 @@ document.addEventListener("DOMContentLoaded", function () {
     var popupDiv = document.getElementById('popup');
     var signatureDataField = document.getElementById('signature-data');
     var canvas = document.getElementById('sig-canvas');
-    var previewImage = document.getElementById('signature-preview');
-    var signaturePad;
+    var signaturePad = new SignaturePad(canvas);
+    var counter = 1; // Initialiser le compteur pour les champs dynamiques
 
     signButton.addEventListener("click", function () {
         popupDiv.style.display = 'block';
-        signaturePad = new SignaturePad(canvas);
+        signaturePad.clear(); // Effacez la signature précédente (si présente)
     });
 
-    saveButton.addEventListener("click", function () {
-        if (!signaturePad.isEmpty()) {
-            var signatureDataURL = signaturePad.toDataURL();
-            signatureDataField.value = signatureDataURL;
+    var previewImage = document.getElementById('signature-preview');
 
-            // Mettre à jour la prévisualisation de la signature
-            previewImage.src = signatureDataURL;
+saveButton.addEventListener("click", function () {
+    if (!signaturePad.isEmpty()) {
+        var signatureDataURL = signaturePad.toDataURL();
+        signatureDataField.value = signatureDataURL;
+        previewImage.src = signatureDataURL; // Ajoutez cette ligne
+        previewImage.style.display = 'block'; // Affichez la prévisualisation de la signature
 
-            // Fermer le popup
-            popupDiv.style.display = 'none';
-        } else {
-            alert("Veuillez signer avant de sauvegarder.");
-        }
-    });
+        popupDiv.style.display = 'none';
+    } else {
+        alert("Veuillez signer avant de sauvegarder.");
+    }
+});
 
     clearButton.addEventListener("click", function () {
         signaturePad.clear();

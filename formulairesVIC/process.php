@@ -18,9 +18,10 @@ class MYPDF extends TCPDF
 
     public function Header()
     {
+        $this->Image('../images/imgpreview.jpg', 10, 10, 33, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
         $this->SetFont('helvetica', 'B', 20);
-        $this->Image('../images/imgpreview.jpg', 10, 10, 33, 0, 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
-        $this->Cell(0, 15, "Visite d'inspection commune ", 0, false, 'C', 0, '', 0, false, 'M', 'M');
+        $this->SetY(25); // Ajustez cette valeur pour aligner le titre avec l'image
+        $this->Cell(0, 15, "Rapport de Visite de chantier", 0, false, 'C', 0, '', 0, false, 'M', 'M');
     }
 
     public function Footer()
@@ -43,39 +44,41 @@ $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
 $pdf->SetFont('dejavusans', 'B', 10);
 $pdf->Ln(40);
-function addSectionToPdf($pdf, $title, $fields, $checkboxFields = [], $numCols = 2)
-{
+function addSectionToPdf($pdf, $title, $fields, $checkboxFields = [], $numCols = 2) {
     $pdf->AddPage();
+    $pdf->SetFont('dejavusans', 'B', 12); // Police en gras pour le titre
     $htmlcontent = '<h1 style="text-align:center;">' . $title . '</h1><hr><br>';
+    $pdf->SetFont('dejavusans', '', 10); // Police normale pour le contenu
+
     foreach ($fields as $field) {
-        if (!in_array($field, $checkboxFields)) {
-            $postKey = str_replace(['.', ' ', '(', ')'], '_', $field);
-            if (isset($_POST[$postKey])) {
-                $field_value = $_POST[$postKey];
-                if (is_array($field_value)) {
-                    $field_value = formatMultiValueField($field_value);
-                    $htmlcontent .= '<p style="margin-bottom: 10px;"><b>' . $field . ':</b> ' . $field_value . '</p>';
-                } elseif (trim($field_value) != '') {
-                    $field_value = formatMultiValueField($field_value);
-                    $htmlcontent .= '<p style="margin-bottom: 10px;"><b>' . $field . ':</b> ' . $field_value . '</p>';
-                }
+        $postKey = str_replace(['.', ' ', '(', ')'], '_', $field);
+        if (isset($_POST[$postKey])) {
+            $field_value = $_POST[$postKey];
+            if (is_array($field_value)) {
+                $field_value = formatMultiValueField($field_value);
+                $htmlcontent .= '<p><b>' . str_replace('_', ' ', $field) . ':</b></p><p>' . $field_value . '</p>'; // Remplacez _ par un espace
+            } elseif (trim($field_value) != '') {
+                $field_value = formatMultiValueField($field_value);
+                $htmlcontent .= '<p><b>' . str_replace('_', ' ', $field) . ':</b></p><p>' . $field_value . '</p>'; // Remplacez _ par un espace
             }
         }
     }
+
+    // Gestion des cases à cocher
     if (count($checkboxFields) > 0) {
         $htmlcontent .= '<table width="100%"><tr>';
         $colWidth = 100 / $numCols;
         $colCount = 0;
 
         foreach ($checkboxFields as $checkboxField) {
-            $postKey = str_replace(['.', ' ', '(', ')'], '_', $checkboxField);
+            $postKey = str_replace(['.', ' ', '(', ')', '[', ']'], '_', $checkboxField);
             if (isset($_POST[$postKey])) {
                 if ($colCount >= $numCols) {
                     $htmlcontent .= '</tr><tr>';
                     $colCount = 0;
                 }
                 $field_value = formatMultiValueField($_POST[$postKey], true);
-                $htmlcontent .= '<td width="' . $colWidth . '%"><p>' . $checkboxField . '</p><p>' . $field_value . '</p></td>';
+                $htmlcontent .= '<td width="' . $colWidth . '%"><p><b>' . str_replace('_', ' ', $checkboxField) . ':</b></p><p>' . $field_value . '</p></td>'; // Remplacez _ par un espace
                 $colCount++;
             }
         }
@@ -84,26 +87,10 @@ function addSectionToPdf($pdf, $title, $fields, $checkboxFields = [], $numCols =
 
     $pdf->writeHTML($htmlcontent, true, false, true, false, '');
 }
-$fields_chapIntro = [
-    'Chantier',
-    'Maitre d’Ouvrage',
-    'Maitre d’Œuvre',
-    'Lot concerné'
-];
-addSectionToPdf($pdf, 'Information Chantier', $fields_chapIntro, []);
 
-$fields_chap1 = [
-    'Titulaire',
-    'Sous-Traitant de',
-    'Date début de travaux',
-    'Date fin des travaux',
-    'Travaux sous-traités',
-    'EffectifsMoyens',
-    'Effectifs de pointe'
-];
-addSectionToPdf($pdf, 'Entreprise Intervenante', $fields_chap1, []);
 
-$checkboxFieldsChap2 = [
+
+$checkboxFieldsChapIntro = [
     'P.G.C',
     'D.I.C.T',
     'P.P.S.P.S',
@@ -111,16 +98,28 @@ $checkboxFieldsChap2 = [
     'PRA (SS3)',
     'MOA (SS4)'
 ];
-$fields_chap2 = [
+
+$fields_chapIntro = [
+    'Chantier',
+    'Maitre d’Ouvrage',
+    'Maitre d’Œuvre',
+    'Lot concerné',
+    'Titulaire',
+    'Sous-Traitant de',
+    'Date début de travaux',
+    'Date fin des travaux',
+    'Travaux sous-traités',
+    'EffectifsMoyens',
+    'Effectifs de pointe',
     'P.G.C',
     'D.I.C.T',
     'P.P.S.P.S',
     'Arrêtés de circulation',
-    'PRA (SS3)',
-    'MOA (SS4)',
+    'PRA_SS3',
+    'MOA_SS4',
     'Autres documents'
 ];
-addSectionToPdf($pdf, 'Document préparatoire', $fields_chap2, $checkboxFieldsChap2);
+addSectionToPdf($pdf, 'Information Chantier', $fields_chapIntro, $checkboxFieldsChapIntro);
 
 $checkboxFieldsChap3 = [
     'Base vie mobile',
@@ -195,10 +194,50 @@ $fields_chap5 = [
     'Risques exportés',
     'Risques importés',
     'Interventions susceptibles d’être dangereuses',
+    'AutresChantier1',
     'Protections à installer',
-    'Autres'
+    'AutresChantier2'
 ];
 addSectionToPdf($pdf, 'Risques', $fields_chap5, []);
+$pdf->AddPage();
+
+// Récupérer les données de la signature
+$signatureData = isset($_POST['signatureData']) ? $_POST['signatureData'] : null;
+
+$htmlcontent = '
+    <h3>Visite du site faite ce jour pour analyse des conditions d’exécution des travaux</h3>
+    <table>
+        <tr>
+            <td>Entreprise: ' . htmlspecialchars($postData['EntrepriseSignature'][0] ?? '') . '</td>
+            <td>Coordonnateur S.P.S: ' . htmlspecialchars($postData['Nom2'] ?? 'MONGARS Gaël') . '</td>
+        </tr>
+        <tr>
+            <td>Nom: ' . htmlspecialchars($postData['Nom1'] ?? '') . '</td>
+            <td>Date: ' . date('d/m/Y') . '</td>
+        </tr>
+            <tr>
+                <td>Date: ' . date('d/m/Y') . '</td>
+                <td><img src="../images/signature.png" width="220" height="100"></td>
+            </tr>
+            <tr>
+        </table>';
+
+$pdf->writeHTML($htmlcontent, true, false, true, false, '');
+
+if (isset($_POST['signatureData']) && !empty($_POST['signatureData'])) {
+    $signatureData = str_replace('data:image/png;base64,', '', $_POST['signatureData']);
+    $signatureData = str_replace(' ', '+', $signatureData);
+    $signatureImage = base64_decode($signatureData);
+    $signatureFilePath = tempnam(sys_get_temp_dir(), 'sig');
+    file_put_contents($signatureFilePath, $signatureImage);
+
+    // Ajustez ces valeurs pour aligner avec la signature statique
+    $pdf->Image($signatureFilePath, 15, 80, 40, 20, 'PNG', '', '', false, 300, '', false, false, 0, false, false, false);
+
+    unlink($signatureFilePath);
+}
+
+
 
 $nom_du_fichier = 'Formulaire_Visite_Inspection_' . date('Y_m_d_H_i_s') . '.pdf';
 $chemin_du_fichier = __DIR__ . "/PDF/" . $nom_du_fichier;

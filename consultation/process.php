@@ -188,8 +188,6 @@ function generatePdf($postData, $chantierId)
     $y = $pdf->GetY();
     $pdf->Line(10, $y, 200, $y);
     $pdf->Ln(2);
-
-    // Add persons
     $pdf->SetFont('helvetica', 'B', 14);
     $pdf->Cell(0, 0, 'Personnes presentes:', 0, 1, '');
     $pdf->SetFont('helvetica', '', 12);
@@ -204,19 +202,17 @@ function generatePdf($postData, $chantierId)
     $y = $pdf->GetY();
     $pdf->Line(10, $y, 200, $y);
     $pdf->Ln(2);
-
-    // Add observations
     $pdf->SetFont('helvetica', 'B', 14);
     $pdf->Cell(0, 0, 'Observations:', 0, 1, '');
 
     $i = 1;
-    while (isset($postData["observation{$i}"]) && !empty($postData["observation{$i}"])) {
-        $pdf->MultiCell(0, 10, 'Observation ' . $i . ': ' . clean_input($postData["observation{$i}"]), 0, 'L');
-
-        $imageFilePaths = getImagePathsForObservation($chantierId, $i);
-
-        foreach ($imageFilePaths as $imageFilePath) {
-            if ($imageFilePath) {
+    for ($i = 1; $i <= 3; $i++) {
+        if (isset($postData["observation{$i}"]) && !empty($postData["observation{$i}"])) {
+            $pdf->MultiCell(0, 10, 'Observation ' . $i . ': ' . clean_input($postData["observation{$i}"]), 0, 'L');
+            $imageFilePaths = getImagePathsForObservation($chantierId, $i);
+            foreach ($imageFilePaths as $imageFilePath) {
+                if (file_exists($imageFilePath)) {
+                    list($width, $height) = getimagesize($imageFilePath);
                 $maxHeight = 60;
                 list($width, $height) = getimagesize($imageFilePath);
                 $newWidth = ($maxHeight / $height) * $width;
@@ -235,8 +231,7 @@ function generatePdf($postData, $chantierId)
                 unlink($imageFilePath);
             }
         }
-
-        // Ajoutez les autres dÃ©tails pour cette observation
+    }
         $fields = [
             'date' => 'Date',
             'heure' => 'Heure',
