@@ -24,9 +24,27 @@ $personnes = $stmt->fetchAll();
 // Récupérer les observations
 $observations = [];
 for ($i = 1; $i <= 3; $i++) {
-  $stmt = $pdo->prepare("SELECT *, TO_BASE64(photo) AS photo_base64 FROM `observations` WHERE `chantier_id` = :chantier_id AND `observation_number` = :obs_number");
+  $stmt = $pdo->prepare("SELECT * FROM observations WHERE chantier_id = :chantier_id AND observation_number = :obs_number");
   $stmt->execute(['chantier_id' => $chantier_id, 'obs_number' => $i]);
-  $observations[$i] = $stmt->fetch();
+  $observation = $stmt->fetch();
+
+  if ($observation) {
+    // Récupérer les images pour cette observation
+    $imgStmt = $pdo->prepare("SELECT TO_BASE64(image) AS image_base64 FROM observation_images WHERE observation_id = :observation_id");
+    $imgStmt->execute(['observation_id' => $observation['observation_id']]);
+    $images = $imgStmt->fetchAll();
+
+    $observations[$i] = [
+      'details' => $observation,
+      'images' => $images
+    ];
+  } else {
+    // Pas d'observation trouvée pour cet index, initialiser les données à un tableau vide ou à des valeurs par défaut
+    $observations[$i] = [
+      'details' => [],
+      'images' => []
+    ];
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -82,35 +100,34 @@ for ($i = 1; $i <= 3; $i++) {
           <label>Type de visite:</label>
           <div class="radio-buttons">
             <label for="reunion">
-              <input type="radio" id="reunion1" name="typeVisite1" value="reunion" <?php echo (isset($observations[1]['typeVisite']) && $observations[1]['typeVisite'] == 'reunion') ? 'checked' : ''; ?>>Réunion</label>
-
+              <input type="radio" id="reunion1" name="typeVisite1" value="reunion" <?php echo ($observations[1]['details']['typeVisite'] ?? '') == 'reunion' ? 'checked' : ''; ?>>Réunion</label>
             <label for="visiteInopinee">
               <input type="radio" id="visiteInopinee1" name="typeVisite1" value="visiteInopinee" <?php echo (isset($observations[1]['typeVisite']) && $observations[1]['typeVisite'] == 'visiteInopinee') ? 'checked' : ''; ?>>Visite inopinée</label>
-
             <label for="autre">
               <input type="radio" id="autre1" name="typeVisite1" value="autre" <?php echo (isset($observations[1]['typeVisite']) && $observations[1]['typeVisite'] == 'autre') ? 'checked' : ''; ?>>Autre</label>
           </div>
-
           <div class="input-group" id="autreText1" style="<?php echo (isset($observations[1]['typeVisite']) && $observations[1]['typeVisite'] == 'autre') ? 'display: block;' : 'display: none;'; ?>">
             <label for="autreDescription">Précisez:</label>
             <input type="text" name="autreDescription1" id="autreDescription1" value="<?php echo isset($observations[1]['autreDescription']) ? $observations[1]['autreDescription'] : ''; ?>">
           </div>
           <label>Date:</label>
-          <input type="date" name="date1" id="date1" value="<?php echo $observations[1]['date']; ?>">
+          <input type="date" name="date1" id="date1" value="<?= $observations[1]['details']['date'] ?? '' ?>">
           <label>Heure:</label>
-          <input type="time" name="heure1" id="heure1" value="<?php echo $observations[1]['heure']; ?>">
+          <input type="time" name="heure1" id="heure1" value="<?= $observations[1]['details']['heure'] ?? '' ?>">
           <br>
-          <?php if ($observations[1] && $observations[1]['photo']) : ?>
-            <img src="data:image/jpeg;base64,<?= base64_encode($observations[1]['photo']) ?>" alt="Photo d'observation 1" />
+          <?php if (!empty($observations[1]['images'])) : ?>
+            <?php foreach ($observations[1]['images'] as $image) : ?>
+              <img src="data:image/jpeg;base64,<?= $image['image_base64'] ?>" alt="Photo d'observation 1" />
+            <?php endforeach; ?>
           <?php else : ?>
-            <input type="file" name="photo1" accept="image/*">
+            <input type="file" name="photo1[]" accept="image/*" multiple>
           <?php endif; ?>
-          <textarea name="observation1" rows="5" cols="50" maxlength="1000"><?php echo $observations[1]['texte']; ?></textarea>
+          <textarea name="observation1" rows="5" cols="50" maxlength="1000"><?php echo $observations[1]['details']['texte'] ?? ''; ?></textarea>
           <label for="entreprise1">Entreprise:</label>
-          <input type="text" name="entreprise1" id="entreprise1" value="<?php echo $observations[1]['entreprise']; ?>">
+          <input type="text" name="entreprise1" id="entreprise1" value="<?php echo $observations[1]['details']['entreprise']??''; ?>">
           <br>
           <label for="effectif1">Effectif:</label>
-          <input type="text" name="effectif1" id="effectif1" value="<?php echo $observations[1]['effectif']; ?>">
+          <input type="text" name="effectif1" id="effectif1" value="<?php echo $observations[1]['details']['effectif']??''; ?>">
           <br>
         </div>
         <div id="observation2" class="tab-content">
@@ -130,21 +147,23 @@ for ($i = 1; $i <= 3; $i++) {
             <input type="text" name="autreDescription2" id="autreDescription2" value="<?php echo isset($observations[2]['autreDescription']) ? $observations[2]['autreDescription'] : ''; ?>">
           </div>
           <label>Date:</label>
-          <input type="date" name="date2" id="date2" value="<?php echo isset($observations[2]['date']) ? $observations[2]['date'] : ''; ?>">
+          <input type="date" name="date2" id="date2" value="<?= $observations[2]['details']['date'] ?? '' ?>">
           <label>Heure:</label>
-          <input type="time" name="heure2" id="heure2" value="<?php echo isset($observations[2]['heure']) ? $observations[2]['heure'] : ''; ?>">
+          <input type="time" name="heure2" id="heure2" value="<?= $observations[2]['details']['heure'] ?? '' ?>">
           <br>
-          <textarea name="observation2" rows="5" cols="50" maxlength="1000"><?php echo isset($observations[2]['texte']) ? $observations[2]['texte'] : ''; ?></textarea>
-          <?php if ($observations[2] && $observations[2]['photo']) : ?>
-            <img src="data:image/jpeg;base64,<?= base64_encode($observations[2]['photo']) ?>" alt="Photo d'observation 2" />
+          <textarea name="observation2" rows="5" cols="50" maxlength="1000"><?php echo $observations[2]['details']['texte'] ?? ''; ?></textarea>
+          <?php if (!empty($observations[2]['images'])) : ?>
+            <?php foreach ($observations[2]['images'] as $image) : ?>
+              <img src="data:image/jpeg;base64,<?= $image['image_base64'] ?>" alt="Photo d'observation 2" />
+            <?php endforeach; ?>
           <?php else : ?>
-            <input type="file" name="photo2" accept="image/*">
+            <input type="file" name="photo2[]" accept="image/*" multiple>
           <?php endif; ?>
           <label for="entreprise2">Entreprise:</label>
-          <input type="text" name="entreprise2" id="entreprise2" value="<?php echo isset($observations[2]['entreprise']) ? $observations[2]['entreprise'] : ''; ?>">
+          <input type="text" name="entreprise2" id="entreprise2" value="<?php echo $observations[2]['details']['entreprise']??''; ?>">
           <br>
           <label for="effectif2">Effectif:</label>
-          <input type="text" name="effectif2" id="effectif2" value="<?php echo isset($observations[2]['effectif']) ? $observations[2]['effectif'] : ''; ?>">
+          <input type="text" name="effectif2" id="effectif2" value="<?php echo $observations[2]['details']['effectif']?? '';?>">
           <br>
         </div>
         <div id="observation3" class="tab-content">
@@ -162,22 +181,24 @@ for ($i = 1; $i <= 3; $i++) {
             <input type="text" name="autreDescription3" id="autreDescription3" value="<?php echo isset($observations[3]['autreDescription']) ? $observations[3]['autreDescription'] : ''; ?>">
           </div>
           <label>Date:</label>
-          <input type="date" name="date3" id="date3" value="<?php echo isset($observations[3]['date']) ? $observations[3]['date'] : ''; ?>">
+          <input type="date" name="date3" id="date3" value="<?= $observations[3]['details']['date'] ?? '' ?>">
           <label>Heure:</label>
-          <input type="time" name="heure3" id="heure3" value="<?php echo isset($observations[3]['heure']) ? $observations[3]['heure'] : ''; ?>">
+          <input type="time" name="heure3" id="heure3" value="<?= $observations[3]['details']['heure'] ?? '' ?>">
           <br>
-          <textarea name="observation3" rows="5" cols="50" maxlength="1000"><?php echo isset($observations[3]['texte']) ? $observations[3]['texte'] : ''; ?></textarea>
+          <textarea name="observation3" rows="5" cols="50" maxlength="1000"><?php echo $observations[3]['details']['texte'] ?? ''; ?></textarea>
           <br>
-          <?php if ($observations[3] && $observations[3]['photo']) : ?>
-            <img src="data:image/jpeg;base64,<?= base64_encode($observations[3]['photo']) ?>" alt="Photo d'observation 3" />
+          <?php if (!empty($observations[3]['images'])) : ?>
+            <?php foreach ($observations[3]['images'] as $image) : ?>
+              <img src="data:image/jpeg;base64,<?= $image['image_base64'] ?>" alt="Photo d'observation 3" />
+            <?php endforeach; ?>
           <?php else : ?>
-            <input type="file" name="photo3" accept="image/*">
+            <input type="file" name="photo3[]" accept="image/*" multiple>
           <?php endif; ?>
           <label for="entreprise3">Entreprise:</label>
-          <input type="text" name="entreprise3" id="entreprise3" value="<?php echo isset($observations[3]['entreprise']) ? $observations[3]['entreprise'] : ''; ?>">
+          <input type="text" name="entreprise3" id="entreprise3" value="<?php echo $observations[3]['details']['entreprise']??''; ?>">
           <br>
           <label for="effectif3">Effectif:</label>
-          <input type="text" name="effectif3" id="effectif3" value="<?php echo isset($observations[3]['effectif']) ? $observations[3]['effectif'] : ''; ?>">
+          <input type="text" name="effectif3" id="effectif3" value="<?php echo $observations[3]['details']['effectif']?? '';?>">
           <br>
         </div>
         <br>

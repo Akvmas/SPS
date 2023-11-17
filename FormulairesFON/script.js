@@ -131,30 +131,31 @@ function removeObservation(event) {
   }
 }
 function addInput(divName, event) {
-  event.preventDefault();
-  var newDiv = document.createElement('div');
-  newDiv.className = 'personne-input';
-
-  var newInput = document.createElement('input'); // Créez un élément input
-  newInput.type = 'text'; // Assurez-vous qu'il s'agit d'un champ de texte
-  newInput.name = 'personne' + counter;
-  newInput.id = 'personne' + counter;
-  newInput.required = true;
-
-  var removeButton = document.createElement('button');
-  removeButton.type = 'button';
-  removeButton.className = 'remove-button';
-  removeButton.textContent = 'x';
-  removeButton.onclick = function(event) {
-      removeInput(newDiv, event);
-  };
-
-  newDiv.appendChild(newInput); // Ajoutez l'élément input à la div
-  newDiv.appendChild(removeButton);
-
-  document.getElementById(divName).appendChild(newDiv);
-  counter++;
-}
+    event.preventDefault();
+    var newDiv = document.createElement('div');
+    newDiv.className = 'personne-input';
+  
+    var newInput = document.createElement('input'); // Créez un élément input
+    newInput.type = 'text'; // Assurez-vous qu'il s'agit d'un champ de texte
+    newInput.name = 'personne[]'; // Supprimez "+ counter" ici
+    newInput.id = 'personne' + counter;
+    newInput.required = true;
+  
+    var removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'remove-button';
+    removeButton.textContent = 'x';
+    removeButton.onclick = function(event) {
+        removeInput(newDiv, event);
+    };
+  
+    newDiv.appendChild(newInput); // Ajoutez l'élément input à la div
+    newDiv.appendChild(removeButton);
+  
+    document.getElementById(divName).appendChild(newDiv);
+    counter++;
+  }
+  
 
 function removeInput(element,event) {
     event.preventDefault();
