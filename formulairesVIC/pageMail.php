@@ -1,7 +1,5 @@
 <?php
-// Initialiser la session
 session_start();
-// Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
 if (!isset($_SESSION["username"])) {
     header("Location: ../login.php");
     exit();
@@ -13,7 +11,7 @@ use PHPMailer\PHPMailer\Exception;
 require '../vendor/autoload.php';
 
 $folder = 'PDF';
-$files = array_diff(scandir($folder), array('..', '.'));  // Obtenez tous les fichiers du répertoire
+$files = array_diff(scandir($folder), array('..', '.'));
 
 usort($files, function ($a, $b) use ($folder) {
     return filemtime($folder . '/' . $b) - filemtime($folder . '/' . $a);
@@ -26,27 +24,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $from = $_POST['from'];
     $to = $_POST['to'];
 
-    //send the email
     $mail = new PHPMailer(true);
 
     try {
-        //Server settings
         $mail->isSMTP();
-        $mail->Host       = 'smtp.office365.com'; // Specify main and backup SMTP servers
+        $mail->Host       = 'smtp.office365.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'csps@eau17.fr'; // SMTP username
-        $mail->Password   = '6jZAhEp9YrHkmURoR2g2'; // SMTP password
+        $mail->Username   = 'csps@eau17.fr';
+        $mail->Password   = '6jZAhEp9YrHkmURoR2g2';
         $mail->SMTPSecure = 'tsl';
         $mail->Port       = 587;
 
-        //Recipients
         $mail->setFrom($from, 'Mailer');
         $mail->addAddress($to, 'Receiver');
 
-        // Attachments
         $mail->addAttachment($pdf_path);
 
-        // Content
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
         $mail->Subject = 'PDF du formulaire FON';

@@ -286,6 +286,8 @@ if (!isset($_SESSION["username"])) {
                             <input type="text" name="Contrôle" id="Contrôle" class="formbold-form-input" />
                         </div>
                     </div>
+                    <strong>Conformément à la législation en vigueur, un examen d’adéquation sera réalisé avant toute mise en service ou remise en service d’appareil de levage.</strong>
+                    <br>
                     <br>Moyens de secours :</br>
                     <br>
                     <div class="flex flex-wrap formbold--mx-3">

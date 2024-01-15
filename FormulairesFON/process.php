@@ -1,5 +1,4 @@
 <?php
-// Inclure les dépendances et configurations
 include '../config.php';
 require('../vendor/autoload.php');
 ini_set('memory_limit', '500M');
@@ -8,7 +7,6 @@ session_start();
 
 global $pdo;
 
-// Fonction pour nettoyer les entrées
 function clean_input($data)
 {
     $data = trim($data);
@@ -16,7 +14,6 @@ function clean_input($data)
     $data = htmlspecialchars($data);
     return $data;
 }
-// Fonction pour obtenir les chemins des images pour une observation
 function getImagePathsForObservation($observationId)
 {
     global $pdo;
@@ -26,14 +23,13 @@ function getImagePathsForObservation($observationId)
     $imageFilePaths = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $imageContent = $row['image'];
-        $tempFileName = tempnam(sys_get_temp_dir(), 'obs_img_') . '.jpg'; // On suppose que les images sont au format JPEG
+        $tempFileName = tempnam(sys_get_temp_dir(), 'obs_img_') . '.jpg';
         file_put_contents($tempFileName, $imageContent);
         $imageFilePaths[] = $tempFileName;
     }
     return $imageFilePaths;
 }
 
-// Fonction pour vérifier la validité de l'image
 function isValidImage($blob)
 {
     $allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -42,7 +38,6 @@ function isValidImage($blob)
     return in_array($mime, $allowedMimes);
 }
 
-// Fonction pour enregistrer les données du formulaire dans la base de données
 function saveFormData($postData, $fileData)
 {
     global $pdo;
@@ -89,7 +84,7 @@ function saveFormData($postData, $fileData)
                     $photoContent = file_get_contents($fileData['photos' . $obsIndex]["tmp_name"][$key]);
                 } else {
                     echo "Erreur lors du téléchargement de la photo " . $obsIndex . ".";
-                    continue; // Skip this iteration and move to the next photo
+                    continue;
                 }
 
                 $stmt = $pdo->prepare("INSERT INTO observation_images (observation_id, image) VALUES (?, ?)");
@@ -100,7 +95,7 @@ function saveFormData($postData, $fileData)
         $obsIndex++;
     }
     if (isset($_POST['personne']) && is_array($_POST['personne'])) {
-        $personnes = $_POST['personne']; // Récupérez les valeurs du champ dynamique
+        $personnes = $_POST['personne'];
         foreach ($personnes as $nom) {
             if (!empty($nom)) {
                 $nom = htmlspecialchars($nom);
@@ -114,7 +109,6 @@ function saveFormData($postData, $fileData)
     return $chantierId;
 }
 
-// Classe PDF personnalisée
 class MYPDF extends TCPDF
 {
     public function Header()
@@ -132,7 +126,6 @@ class MYPDF extends TCPDF
     }
 }
 
-// Fonction pour générer le PDF
 function generatePdf($postData, $chantierId)
 {
     global $pdo;
@@ -147,7 +140,6 @@ function generatePdf($postData, $chantierId)
     $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
     $pdf->AddPage();
 
-    // Add general data to PDF
     $pdf->SetFont('helvetica', 'B', 14);
     $pdf->Ln(30);
 
@@ -172,18 +164,17 @@ function generatePdf($postData, $chantierId)
     $pdf->Ln(2);
 
     $pdf->SetFont('helvetica', '', 12);
-    
-    // Ajoutez une requête SQL pour récupérer les personnes présentes depuis la base de données
+
     $sql = "SELECT nom FROM personnes_presentes WHERE chantier_id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$chantierId]);
     $personnesPresentes = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     foreach ($personnesPresentes as $nom) {
-        $pdf->Cell(0, 0, 'Nom de la personne présente: ' . clean_input($nom), 0, 1, ''); // Augmentez la hauteur de la cellule à 10 pour créer un espacement entre les noms
+        $pdf->Cell(0, 0, 'Nom de la personne présente: ' . clean_input($nom), 0, 1, '');
     }
 
-    
+
     $pdf->Ln(5);
     $y = $pdf->GetY();
     $pdf->Line(10, $y, 200, $y);
@@ -206,31 +197,25 @@ function generatePdf($postData, $chantierId)
 
         foreach ($imageFilePaths as $imageFilePath) {
             if ($imageFilePath) {
-                // Définir une hauteur maximale pour l'image
-                $maxHeight = 60; // par exemple, 60mm
+                $maxHeight = 60;
 
-                // Obtenir les dimensions de l'image originale
                 list($width, $height) = getimagesize($imageFilePath);
 
-                // Calculer la nouvelle largeur en fonction de la hauteur maximale tout en conservant les proportions
                 $newWidth = ($maxHeight / $height) * $width;
 
-                // Obtenir les marges actuelles
                 $margins = $pdf->getMargins();
-                $pageWidth = 210 - $margins['left'] - $margins['right']; // 210mm est la largeur d'une page A4
+                $pageWidth = 210 - $margins['left'] - $margins['right'];
 
-                // Ajuster la largeur maximale de l'image pour qu'elle respecte les marges
                 if ($newWidth > $pageWidth) {
                     $newWidth = $pageWidth;
                     $maxHeight = ($newWidth / $width) * $height;
                 }
 
-                // Calculer la position x pour centrer l'image en tenant compte des marges
                 $x = $margins['left'] + ($pageWidth - $newWidth) / 2;
 
                 $pdf->Image($imageFilePath, $x, '', $newWidth, $maxHeight, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                $pdf->Ln($maxHeight + 5); // Ajouter un espace aprés l'image
-                unlink($imageFilePath); // Supprimer l'image temporaire aprés utilisation
+                $pdf->Ln($maxHeight + 5);
+                unlink($imageFilePath);
             }
         }
         if (!empty($postData["date{$i}"])) {
@@ -243,7 +228,6 @@ function generatePdf($postData, $chantierId)
         if (!empty($postData["typeVisite{$i}"])) {
             $typeVisite = clean_input($postData["typeVisite{$i}"]);
 
-            // Vérifiez si la valeur contient un espace et ajoutez-le si nécessaire
             if (!strpos($typeVisite, ' ')) {
                 $typeVisite = str_replace('visiteInopinee', 'visite Inopinee', $typeVisite);
             }
@@ -270,17 +254,14 @@ function generatePdf($postData, $chantierId)
         $pdf->Ln(2);
         $i++;
 
-        // Ajoutez la phrase dans le PDF
 
-        $pdf->Ln(); // Sautez une ligne pour l'espace
+        $pdf->Ln();
 
-        // Texte à ajouter
         $texte = "Sans remarque de la part de l’entreprise dans un délai de 8 jours, les observations formulées par le Coordonnateur S.P.S. sont réputées acceptées sans réserve.";
 
-        $pdf->MultiCell(0, 10, $texte, 0, 'L'); // Ajoutez le texte avec une largeur de cellule de 0 (auto) et un alignement à gauche
-
+        $pdf->MultiCell(0, 10, $texte, 0, 'L');
     }
-    $chantierName = preg_replace("/[^a-zA-Z0-9]/", "_", $postData['chantier']); // Remplacez les caractéres non alphanumériques par des underscores pour éviter les problémes de nom de fichier
+    $chantierName = preg_replace("/[^a-zA-Z0-9]/", "_", $postData['chantier']);
     $currentDate = date('Ymd');
     $pdfFilename = __DIR__ . "/../RenduPdf/{$chantierName}_{$currentDate}.pdf";
     $pdf->Output($pdfFilename, 'F');
@@ -288,7 +269,6 @@ function generatePdf($postData, $chantierId)
     return $pdfFilename;
 }
 
-// Enregistrez les données du formulaire dans la base de données
 $chantierId = saveFormData($_POST, $_FILES);
 if ($chantierId) {
     echo "Données enregistrées avec succés.<br>";
@@ -296,12 +276,9 @@ if ($chantierId) {
     die("Erreur lors de l'enregistrement des données.");
 }
 
-// Générez le PDF
 $pdfFilename = generatePdf($_POST, $chantierId);
 echo "PDF généré: " . $pdfFilename;
 
-// Stocker le nom du fichier PDF en session pour l'utiliser plus tard
 $_SESSION['pdfFilename'] = $pdfFilename;
 header("Location: ../mail/pageMail.php?file=" . urlencode($nom_du_fichier));
-// Rediriger l'utilisateur vers la page d'envoi de l'e-mail
 die;

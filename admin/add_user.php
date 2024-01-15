@@ -1,37 +1,34 @@
 <!DOCTYPE html>
 <?php
-  // Initialiser la session
-  session_start();
-  // V�rifiez si l'utilisateur est connect�, sinon redirigez-le vers la page de connexion
-  if(!isset($_SESSION["username"])){
+session_start();
+if (!isset($_SESSION["username"])) {
     header("Location: login.php");
-    exit(); 
-  }
+    exit();
+}
 ?>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="../css/style.css">
-    </head>
-    <body class="img js-fullheight" style="background-image: url(../images/bg.jpeg);">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="img js-fullheight" style="background-image: url(../images/bg.jpeg);">
     <?php
-        require('../config.php');
-        if (isset($_REQUEST['username'],$_REQUEST['type'], $_REQUEST['password'])){
-            // r�cup�rer le nom d'utilisateur et supprime les antislashes
-            $username = stripslashes($_REQUEST['username']);
-            // r�cup�rer le mot de passe et supprime les antislashes
-            $password = stripslashes($_REQUEST['password']);
-            // r�cup�rer le type (user | admin) et supprime les antislashes
-            $type = stripslashes($_REQUEST['type']);
-            $password = hash('sha256', $password);
-            $query = "INSERT into `user` (username, type, password) VALUES (?, ?, ?)";
-            $statement = $pdo->prepare($query);
-            $res = $statement->execute([$username, $type, $password]);
-            if($res){
-                echo "
+    require('../config.php');
+    if (isset($_REQUEST['username'], $_REQUEST['type'], $_REQUEST['password'])) {
+        $username = stripslashes($_REQUEST['username']);
+        $password = stripslashes($_REQUEST['password']);
+        $type = stripslashes($_REQUEST['type']);
+        $password = hash('sha256', $password);
+        $query = "INSERT into `user` (username, type, password) VALUES (?, ?, ?)";
+        $statement = $pdo->prepare($query);
+        $res = $statement->execute([$username, $type, $password]);
+        if ($res) {
+            echo "
                 <body class='img js-fullheight' style='background-image: url(../images/bg.jpeg);'>
                 <div class='ftco-section'>
                 <div class='container'>
@@ -49,25 +46,25 @@
                 </div>
                 </div>
                 </div>";
-            }
-        }else{
-            ?>
-            <section class="ftco-section">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 text-center mb-5">
-                            <h2 class="heading-section">Add User</h2>
-                        </div>
+        }
+    } else {
+    ?>
+        <section class="ftco-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 text-center mb-5">
+                        <h2 class="heading-section">Add User</h2>
                     </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 col-lg-4">
-                            <div class="login-wrap p-0">
-                                <form class="signin-form"  action="" method="post" name="login">
-                                    <div class="form-group">
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="login-wrap p-0">
+                            <form class="signin-form" action="" method="post" name="login">
+                                <div class="form-group">
                                     <input type="text" class="form-control" name="username" placeholder="username" required>
                                 </div>
                                 <div class="form-group">
-                                    <select class="form-control" name="type" id="type" >
+                                    <select class="form-control" name="type" id="type">
                                         <option value="" disabled selected>Type</option>
                                         <option value="admin">Admin</option>
                                         <option value="user">User</option>
@@ -90,7 +87,8 @@
         <script src="../js/popper.js"></script>
         <script src="../js/bootstrap.min.js"></script>
         <script src="../js/main.js"></script>
-        <?php 
-        } ?>
-    </body>
+    <?php
+    } ?>
+</body>
+
 </html>

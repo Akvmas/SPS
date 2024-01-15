@@ -1,7 +1,5 @@
 <?php
-// Initialiser la session
 session_start();
-// Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
 if (!isset($_SESSION["username"])) {
   header("Location: ../login.php");
   exit();
@@ -124,10 +122,10 @@ for ($i = 1; $i <= 3; $i++) {
           <?php endif; ?>
           <textarea name="observation1" rows="5" cols="50" maxlength="1000"><?php echo $observations[1]['details']['texte'] ?? ''; ?></textarea>
           <label for="entreprise1">Entreprise:</label>
-          <input type="text" name="entreprise1" id="entreprise1" value="<?php echo $observations[1]['details']['entreprise']??''; ?>">
+          <input type="text" name="entreprise1" id="entreprise1" value="<?php echo $observations[1]['details']['entreprise'] ?? ''; ?>">
           <br>
           <label for="effectif1">Effectif:</label>
-          <input type="text" name="effectif1" id="effectif1" value="<?php echo $observations[1]['details']['effectif']??''; ?>">
+          <input type="text" name="effectif1" id="effectif1" value="<?php echo $observations[1]['details']['effectif'] ?? ''; ?>">
           <br>
         </div>
         <div id="observation2" class="tab-content">
@@ -160,10 +158,10 @@ for ($i = 1; $i <= 3; $i++) {
             <input type="file" name="photo2[]" accept="image/*" multiple>
           <?php endif; ?>
           <label for="entreprise2">Entreprise:</label>
-          <input type="text" name="entreprise2" id="entreprise2" value="<?php echo $observations[2]['details']['entreprise']??''; ?>">
+          <input type="text" name="entreprise2" id="entreprise2" value="<?php echo $observations[2]['details']['entreprise'] ?? ''; ?>">
           <br>
           <label for="effectif2">Effectif:</label>
-          <input type="text" name="effectif2" id="effectif2" value="<?php echo $observations[2]['details']['effectif']?? '';?>">
+          <input type="text" name="effectif2" id="effectif2" value="<?php echo $observations[2]['details']['effectif'] ?? ''; ?>">
           <br>
         </div>
         <div id="observation3" class="tab-content">
@@ -195,10 +193,10 @@ for ($i = 1; $i <= 3; $i++) {
             <input type="file" name="photo3[]" accept="image/*" multiple>
           <?php endif; ?>
           <label for="entreprise3">Entreprise:</label>
-          <input type="text" name="entreprise3" id="entreprise3" value="<?php echo $observations[3]['details']['entreprise']??''; ?>">
+          <input type="text" name="entreprise3" id="entreprise3" value="<?php echo $observations[3]['details']['entreprise'] ?? ''; ?>">
           <br>
           <label for="effectif3">Effectif:</label>
-          <input type="text" name="effectif3" id="effectif3" value="<?php echo $observations[3]['details']['effectif']?? '';?>">
+          <input type="text" name="effectif3" id="effectif3" value="<?php echo $observations[3]['details']['effectif'] ?? ''; ?>">
           <br>
         </div>
         <br>

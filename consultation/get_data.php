@@ -19,7 +19,7 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $result = ['chantier' => $data[0], 'personnes' => [], 'observations' => []];
 
-foreach($data as $row) {
+foreach ($data as $row) {
   if (!empty($row['personne'])) {
     $result['personnes'][] = $row['personne'];
   }

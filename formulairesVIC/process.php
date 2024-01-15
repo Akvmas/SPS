@@ -20,7 +20,7 @@ class MYPDF extends TCPDF
     {
         $this->Image('../images/imgpreview.jpg', 10, 10, 33, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
         $this->SetFont('helvetica', 'B', 20);
-        $this->SetY(25); // Ajustez cette valeur pour aligner le titre avec l'image
+        $this->SetY(25);
         $this->Cell(0, 15, "Rapport de Visite de chantier", 0, false, 'C', 0, '', 0, false, 'M', 'M');
     }
 
@@ -44,11 +44,12 @@ $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
 $pdf->SetFont('dejavusans', 'B', 10);
 $pdf->Ln(40);
-function addSectionToPdf($pdf, $title, $fields, $checkboxFields = [], $numCols = 2) {
+function addSectionToPdf($pdf, $title, $fields, $checkboxFields = [], $numCols = 2)
+{
     $pdf->AddPage();
-    $pdf->SetFont('dejavusans', 'B', 12); // Police en gras pour le titre
+    $pdf->SetFont('dejavusans', 'B', 12);
     $htmlcontent = '<h1 style="text-align:center;">' . $title . '</h1><hr><br>';
-    $pdf->SetFont('dejavusans', '', 10); // Police normale pour le contenu
+    $pdf->SetFont('dejavusans', '', 10);
 
     foreach ($fields as $field) {
         $postKey = str_replace(['.', ' ', '(', ')'], '_', $field);
@@ -56,15 +57,14 @@ function addSectionToPdf($pdf, $title, $fields, $checkboxFields = [], $numCols =
             $field_value = $_POST[$postKey];
             if (is_array($field_value)) {
                 $field_value = formatMultiValueField($field_value);
-                $htmlcontent .= '<p><b>' . str_replace('_', ' ', $field) . ':</b></p><p>' . $field_value . '</p>'; // Remplacez _ par un espace
+                $htmlcontent .= '<p><b>' . str_replace('_', ' ', $field) . ':</b></p><p>' . $field_value . '</p>';
             } elseif (trim($field_value) != '') {
                 $field_value = formatMultiValueField($field_value);
-                $htmlcontent .= '<p><b>' . str_replace('_', ' ', $field) . ':</b></p><p>' . $field_value . '</p>'; // Remplacez _ par un espace
+                $htmlcontent .= '<p><b>' . str_replace('_', ' ', $field) . ':</b></p><p>' . $field_value . '</p>';
             }
         }
     }
 
-    // Gestion des cases à cocher
     if (count($checkboxFields) > 0) {
         $htmlcontent .= '<table width="100%"><tr>';
         $colWidth = 100 / $numCols;
@@ -78,7 +78,7 @@ function addSectionToPdf($pdf, $title, $fields, $checkboxFields = [], $numCols =
                     $colCount = 0;
                 }
                 $field_value = formatMultiValueField($_POST[$postKey], true);
-                $htmlcontent .= '<td width="' . $colWidth . '%"><p><b>' . str_replace('_', ' ', $checkboxField) . ':</b></p><p>' . $field_value . '</p></td>'; // Remplacez _ par un espace
+                $htmlcontent .= '<td width="' . $colWidth . '%"><p><b>' . str_replace('_', ' ', $checkboxField) . ':</b></p><p>' . $field_value . '</p></td>';
                 $colCount++;
             }
         }
@@ -201,7 +201,6 @@ $fields_chap5 = [
 addSectionToPdf($pdf, 'Risques', $fields_chap5, []);
 $pdf->AddPage();
 
-// Récupérer les données de la signature
 $signatureData = isset($_POST['signatureData']) ? $_POST['signatureData'] : null;
 
 $htmlcontent = '
@@ -231,7 +230,6 @@ if (isset($_POST['signatureData']) && !empty($_POST['signatureData'])) {
     $signatureFilePath = tempnam(sys_get_temp_dir(), 'sig');
     file_put_contents($signatureFilePath, $signatureImage);
 
-    // Ajustez ces valeurs pour aligner avec la signature statique
     $pdf->Image($signatureFilePath, 15, 80, 40, 20, 'PNG', '', '', false, 300, '', false, false, 0, false, false, false);
 
     unlink($signatureFilePath);

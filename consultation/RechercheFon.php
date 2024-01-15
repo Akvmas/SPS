@@ -4,8 +4,8 @@
 session_start();
 // Vérifiez si l'utilisateur est connecté, sinon redirigez-le vers la page de connexion
 if (!isset($_SESSION["username"])) {
-    header("Location: ../login.php");
-    exit();
+  header("Location: ../login.php");
+  exit();
 }
 ?>
 <html>
@@ -19,7 +19,7 @@ if (!isset($_SESSION["username"])) {
   <form action="get_chantiers.php" method="post">
     <select name="chantier" style="width:500px;">
       <?php
-      include 'get_chantier.php'; //Ce fichier devrait implémenter le code pour obtenir tous les chantiers depuis la base de données
+      include 'get_chantier.php';
       ?>
     </select>
     <br>
