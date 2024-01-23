@@ -50,7 +50,7 @@ for ($i = 1; $i <= 3; $i++) {
 
 <head>
   <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
@@ -113,6 +113,7 @@ for ($i = 1; $i <= 3; $i++) {
           <label>Heure:</label>
           <input type="time" name="heure1" id="heure1" value="<?= $observations[1]['details']['heure'] ?? '' ?>">
           <br>
+          <textarea name="observation1" rows="5" cols="50" maxlength="1000"><?php echo $observations[1]['details']['texte'] ?? ''; ?></textarea>
           <?php if (!empty($observations[1]['images'])) : ?>
             <?php foreach ($observations[1]['images'] as $image) : ?>
               <img src="data:image/jpeg;base64,<?= $image['image_base64'] ?>" alt="Photo d'observation 1" />
@@ -120,7 +121,6 @@ for ($i = 1; $i <= 3; $i++) {
           <?php else : ?>
             <input type="file" name="photo1[]" accept="image/*" multiple>
           <?php endif; ?>
-          <textarea name="observation1" rows="5" cols="50" maxlength="1000"><?php echo $observations[1]['details']['texte'] ?? ''; ?></textarea>
           <label for="entreprise1">Entreprise:</label>
           <input type="text" name="entreprise1" id="entreprise1" value="<?php echo $observations[1]['details']['entreprise'] ?? ''; ?>">
           <br>

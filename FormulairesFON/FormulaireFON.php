@@ -62,7 +62,7 @@
           <label>Heure:</label>
           <input type="time" name="heure1" id="heure1">
           <br>
-          <textarea type="text" name="observation1" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."></textarea>
+          <textarea name="observation1" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."></textarea>
           <br>
           <input type="file" name="photos1[]" accept="image/*" multiple>
           <br>

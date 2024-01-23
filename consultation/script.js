@@ -19,10 +19,19 @@ window.onload = function () {
     });
 
     document.querySelector('form').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && e.target.nodeName !== 'TEXTAREA') {
             e.preventDefault();
         }
     });
+    
+    $(document).ready(function () {
+        $('form input').on('keypress', function (e) {
+            if (e.which === 13 && e.target.nodeName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        });
+    });
+    
 }
 function validateForm() {
     companyValues = [];
