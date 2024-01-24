@@ -18,34 +18,31 @@ if (!isset($_SESSION["username"])) {
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="img js-fullheight" style="background-image: url(../images/bg.jpeg);">
   <section class="ftco-section">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-md-6 text-center mb-5">
-          <h1>Choix de votre chantier</h1>
+          <h2 class="heading-section">Choix du chantiers</h2>
         </div>
       </div>
-      <div class="login-wrap p-0">
-        <div class="form-group">
-          <form action="get_chantiers.php" method="post">
-            <select class="form-control btn btn-primary submit px-3" name="chantier">
-              <?php
-              include 'get_chantier.php';
-              ?>
-              </select>
-              <br>
-              <br>
-              <input class=" btn btn-primary submit px-3" value="Ouvrir" type="submit">
-            </form>
-        </div>
-      </div>
+      <form action="get_chantiers.php" method="post">
+        <select class="form-control btn btn-primary submit px-3" name="chantier">
+          <?php
+          include 'get_chantier.php';
+          ?>
+        </select>
+        <br>
+        <br>
+        <input class=" btn btn-primary submit px-3" value="Ouvrir" type="submit">
+      </form>
     </div>
   </section>
-  <script src='js/jquery.min.js'></script>
-  <script src='js/popper.js'></script>
-  <script src='js/bootstrap.min.js'></script>
-  <script src='js/main.js'></script>
+  <script src='../js/jquery.min.js'></script>
+  <script src='../js/popper.js'></script>
+  <script src='../js/bootstrap.min.js'></script>
+  <script src='../js/main.js'></script>
 </body>
 
 </html>

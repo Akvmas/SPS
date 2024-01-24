@@ -15,5 +15,6 @@ $opt = [
 try {
      $pdo = new PDO($dsn, $user, $pass, $opt);
 } catch (\PDOException $e) {
-     throw new \PDOException($e->getMessage(), (int)$e->getCode());
+     echo "Erreur de connexion PDO : " . $e->getMessage();
+     exit;
 }
