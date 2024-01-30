@@ -1,7 +1,7 @@
 <?php
 require_once '../config.php';
 require('../vendor/autoload.php');
-ini_set('memory_limit', '500M');
+ini_set('memory_limit', '256M');
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -9,29 +9,27 @@ error_reporting(E_ALL);
 session_start();
 
 global $pdo;
+$uploadedFiles = $_FILES['photos1'];
 
 function clean_input($data) {
     return is_null($data) ? '' : htmlspecialchars(stripslashes(trim($data)));
 }
 
-function saveFormData($pdo)
+function saveFormData($pdo, $uploadedFiles)
 {
     if (!$pdo) {
         die("L'objet PDO n'est pas disponible.");
     }
     $observationIds = [];
-    // Traitement des données du chantier
     $chantier = clean_input($_POST['chantier']);
     $maitreOuvrage = clean_input($_POST['maitreOuvrage']);
     $maitreOeuvre = clean_input($_POST['maitreOeuvre']);
     $coordonnateurSPS = clean_input($_POST['coordonnateurSPS']);
 
-    // Insertion des données de chantier dans la base de données
     $stmt = $pdo->prepare("INSERT INTO chantiers (description, maitreOuvrage, maitreOeuvre, coordonnateurSPS) VALUES (?, ?, ?, ?)");
     $stmt->execute([$chantier, $maitreOuvrage, $maitreOeuvre, $coordonnateurSPS]);
     $chantierId = $pdo->lastInsertId();
 
-    // Traitement des personnes présentes
     if (isset($_POST['personne']) && is_array($_POST['personne'])) {
         foreach ($_POST['personne'] as $personne) {
             if (!empty($personne)) {
@@ -41,8 +39,6 @@ function saveFormData($pdo)
         }
     }
 
-    // Traitement des observations
-    $uploadedImages = [];
     $obsIndex = 1;
     while (isset($_POST['observation' . $obsIndex])) {
         $observation = clean_input($_POST['observation' . $obsIndex]);
@@ -53,16 +49,19 @@ function saveFormData($pdo)
         $typeVisite = $_POST['typeVisite' . $obsIndex];
         $autreDescription = isset($_POST['autreDescription' . $obsIndex]) ? clean_input($_POST['autreDescription' . $obsIndex]) : null;
 
-        // Insertion de l'observation dans la base de données
-        $stmt = $pdo->prepare("INSERT INTO observations (chantier_id, texte, date, heure, entreprise, effectif, typeVisite, autreDescription) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$chantierId, $observation, $dateObservation, $heureObservation, $entreprise, $effectif, $typeVisite, $autreDescription]);
+        $stmt = $pdo->prepare("INSERT INTO observations (chantier_id, texte, date, heure, entreprise, effectif,observation_number, typeVisite, autreDescription) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$chantierId, $observation, $dateObservation, $heureObservation, $entreprise, $effectif,$obsIndex,$typeVisite, $autreDescription]);
         $observationId = $pdo->lastInsertId();
         $observationIds[] = $observationId;
-        // Traitement des images
-        if (isset($_FILES['photos' . $obsIndex])) {
-            foreach ($_FILES['photos' . $obsIndex]['tmp_name'] as $index => $tmpName) {
-                if (file_exists($tmpName)) {
-                    $uploadedImages[$obsIndex][] = $tmpName; // Stockez le chemin temporaire de l'image
+
+        if (isset($_FILES['photos1']) && is_array($_FILES['photos1']['tmp_name'])) {
+            foreach ($_FILES['photos1']['tmp_name'] as $tmpName) {
+                if (is_uploaded_file($tmpName)) {
+                    $photoContent = file_get_contents($tmpName);
+                    $stmt = $pdo->prepare("INSERT INTO observation_images (observation_id, image) VALUES (?, ?)");
+                    $stmt->bindParam(1, $observationId, PDO::PARAM_INT);
+                    $stmt->bindParam(2, $photoContent, PDO::PARAM_LOB);
+                    $stmt->execute();
                 }
             }
         }
@@ -87,13 +86,19 @@ class MYPDF extends TCPDF
         $this->SetY(-15);
         $this->SetFont('helvetica', 'I', 8);
         $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    
+        $signatureImagePath = '../images/signature.png'; 
+        $imageWidth = 40; 
+        $imageHeight = 20;
+        $offsetX = 30;
+        $this->Image($signatureImagePath, $this->GetX() - $offsetX, $this->GetY() - 10, $imageWidth, $imageHeight, 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
     }
 }
 
-function generatePdf($postData, $chantierId, $observationIds, $uploadedImages)
-    {
+function generatePdf($postData, $chantierId, $observationIds)
+{
     global $pdo;
-    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+    $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
     // Configuration initiale du PDF
     $pdf->SetCreator(PDF_CREATOR);
@@ -136,59 +141,57 @@ function generatePdf($postData, $chantierId, $observationIds, $uploadedImages)
         $pdf->Cell(0, 0, 'Coordonnateur S.P.S.: ' . clean_input($postData['coordonnateurSPS']), 0, 1, '');
     }
 
-
     $y = $pdf->GetY();
     $pdf->Line(10, $y, 200, $y);
     $pdf->Ln(2);
 
-    $obsIndex = 1;
-    foreach ($observationIds as $obsIndex => $observationId) {
-        $obsIndexAdjusted = $obsIndex + 1;
-        $pdf->MultiCell(0, 10, 'Observation ' . $obsIndex . ': ' . clean_input($postData["observation{$obsIndexAdjusted}"]), 0, 'L');
+    $obsNumber = 1; 
+    foreach ($observationIds as $observationId) {
+        $pdf->MultiCell(0, 10, 'Observation ' . $obsNumber . ': ' . clean_input($postData["observation{$obsNumber}"]), 0, 'L');
         $pdf->Ln(5);
 
         $stmt = $pdo->prepare("SELECT image FROM observation_images WHERE observation_id = ?");
-        $stmt->execute([$observationId]); 
-        if (!empty($uploadedImages[$obsIndexAdjusted])) {
-            foreach ($uploadedImages[$obsIndexAdjusted] as $imagePath) {
-                if (file_exists($imagePath)) {
-                    list($width, $height) = getimagesize($imagePath);
-                    $ratio = $width / $height;
-                    $maxHeight = 60;
-                    $newWidth = $ratio * $maxHeight;
-                    $pdf->Image($imagePath, '', '', $newWidth, $maxHeight, 'JPEG', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                    $pdf->Ln($maxHeight + 5);
-                } else {
-                    echo "Image introuvable: $imagePath";
-                }
+        $stmt->execute([$observationId]);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $imageContent = $row['image'];
+            $image = @imagecreatefromstring($imageContent);
+            if ($image !== false) {
+                $tempImagePath = tempnam(sys_get_temp_dir(), 'img');
+                imagepng($image, $tempImagePath);
+                list($width, $height) = getimagesize($tempImagePath);
+                $ratio = $width / $height;
+                $maxHeight = 60;
+                $newWidth = $ratio * $maxHeight;
+                $pdf->Image($tempImagePath, '', '', $newWidth, $maxHeight, 'PNG', '', 'T', false, 300, '', false, false, 1, false, false, false);
+                $pdf->Ln($maxHeight + 5);
+                unlink($tempImagePath); 
             }
         }
 
-        if (!empty($postData["date{$obsIndexAdjusted}"])) {
-            $pdf->Cell(0, 0, 'Date: ' . clean_input($postData["date{$obsIndexAdjusted}"]), 0, 1, '');
+        if (!empty($postData["date{$obsNumber}"])) {
+            $pdf->Cell(0, 0, 'Date: ' . clean_input($postData["date{$obsNumber}"]), 0, 1, '');
         }
-        if (!empty($postData["heure{$obsIndexAdjusted}"])) {
-            $pdf->Cell(0, 0, 'Heure: ' . clean_input($postData["heure{$obsIndexAdjusted}"]), 0, 1, '');
+        if (!empty($postData["heure{$obsNumber}"])) {
+            $pdf->Cell(0, 0, 'Heure: ' . clean_input($postData["heure{$obsNumber}"]), 0, 1, '');
         }
-        if (!empty($postData["typeVisite{$obsIndexAdjusted}"])) {
-            $typeVisite = clean_input($postData["typeVisite{$obsIndexAdjusted}"]);
+        if (!empty($postData["typeVisite{$obsNumber}"])) {
+            $typeVisite = clean_input($postData["typeVisite{$obsNumber}"]);
             $pdf->Cell(0, 0, 'Type de Visite: ' . $typeVisite, 0, 1, '');
         }
-        if ($postData["typeVisite{$obsIndexAdjusted}"] === 'autre' && !empty($postData["autreDescription{$obsIndexAdjusted}"])) {
-            $pdf->Cell(0, 0, 'Description: ' . clean_input($postData["autreDescription{$obsIndexAdjusted}"]), 0, 1, '');
+        if ($postData["typeVisite{$obsNumber}"] === 'autre' && !empty($postData["autreDescription{$obsNumber}"])) {
+            $pdf->Cell(0, 0, 'Description: ' . clean_input($postData["autreDescription{$obsNumber}"]), 0, 1, '');
         }
-        if (!empty($postData["entreprise{$obsIndexAdjusted}"])) {
-            $pdf->Cell(0, 0, 'Entreprise: ' . clean_input($postData["entreprise{$obsIndexAdjusted}"]), 0, 1, '');
+        if (!empty($postData["entreprise{$obsNumber}"])) {
+            $pdf->Cell(0, 0, 'Entreprise: ' . clean_input($postData["entreprise{$obsNumber}"]), 0, 1, '');
         }
-        if (!empty($postData["effectif{$obsIndexAdjusted}"])) {
-            $pdf->Cell(0, 0, 'Effectif: ' . clean_input($postData["effectif{$obsIndexAdjusted}"]), 0, 1, '');
+        if (!empty($postData["effectif{$obsNumber}"])) {
+            $pdf->Cell(0, 0, 'Effectif: ' . clean_input($postData["effectif{$obsNumber}"]), 0, 1, '');
         }
 
-        $pdf->Ln(10); 
+        $pdf->Ln(10);
 
-        $obsIndex++;
+        $obsNumber++;
     }
-
 
     $pdf->Ln();
 
@@ -201,19 +204,29 @@ function generatePdf($postData, $chantierId, $observationIds, $uploadedImages)
     $pdf->Output($pdfFilename, 'F');
     $pdf->SetPrintHeader(false);
     $pdf->SetPrintFooter(false);
-
+    if (is_array($_FILES['photos1']['tmp_name'])) {
+        foreach ($_FILES['photos1']['tmp_name'] as $index => $tmpName) {
+            if (is_uploaded_file($tmpName)) {
+                $imagePath = $_FILES['photos1']['tmp_name'][$index];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+        }
+    }
+    
     return $pdfFilename;
 }
 
-$result = saveFormData($pdo);
+$result = saveFormData($pdo, $uploadedFiles);
 if ($result['chantierId']) {
-    echo "Données enregistrées avec succés.<br>";
-    $pdfFilename = generatePdf($_POST, $result['chantierId'], $result['observationIds'], $result['uploadedImages']);
+    echo "Données enregistrées avec succès.<br>";
+    $pdfFilename = generatePdf($_POST, $result['chantierId'], $result['observationIds']);
     echo "PDF généré: " . $pdfFilename;
 } else {
     die("Erreur lors de l'enregistrement des données.");
 }
-
 $_SESSION['pdfFilename'] = $pdfFilename;
-header("Location: ../mail/pageMail.php?file=" . urlencode($nom_du_fichier));
+header("Location: ../mail/pageMail.php?file=" . urlencode($pdfFilename));
 die;
+?>

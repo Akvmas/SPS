@@ -41,19 +41,16 @@ body {
 
 .column1 {
   padding-right: 20px;
-  /* Cela ajoute un peu d'espace entre le texte et la ligne verticale */
 }
 
 .column2 {
   padding-left: 20px;
-  /* Cela ajoute un peu d'espace entre le texte et la ligne verticale */
 }
 
 .column1,
 .column2 {
   flex: 1;
   margin-right: 15px;
-  /* Add some margin if you want some space between the columns */
 }
 
 h2 {
@@ -149,4 +146,14 @@ label {
   width: 100%;
   border-bottom: 1px solid #ccc;
   margin: 20px 0;
+}
+#popupForm {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 1px solid #ddd;
+  z-index: 1000;
 }

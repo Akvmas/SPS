@@ -7,19 +7,16 @@ if (!isset($_SESSION["username"])) {
 include '../config.php';
 $chantier_id = $_GET['chantier_id'];
 
-// Fetch chantier details
 $stmt = $pdo->prepare("SELECT * FROM chantiers WHERE id = :chantier_id");
 $stmt->bindParam(':chantier_id', $chantier_id, PDO::PARAM_INT);
 $stmt->execute();
 $chantier = $stmt->fetch();
 
-// Récupérer les données des personnes présentes
 $stmt = $pdo->prepare("SELECT * FROM personnes_presentes WHERE chantier_id = :chantier_id");
 $stmt->bindParam(':chantier_id', $chantier_id, PDO::PARAM_INT);
 $stmt->execute();
 $personnes = $stmt->fetchAll();
 
-// Récupérer les observations
 $observations = [];
 for ($i = 1; $i <= 3; $i++) {
   $stmt = $pdo->prepare("SELECT * FROM observations WHERE chantier_id = :chantier_id AND observation_number = :obs_number");
@@ -27,7 +24,6 @@ for ($i = 1; $i <= 3; $i++) {
   $observation = $stmt->fetch();
 
   if ($observation) {
-    // Récupérer les images pour cette observation
     $imgStmt = $pdo->prepare("SELECT TO_BASE64(image) AS image_base64 FROM observation_images WHERE observation_id = :observation_id");
     $imgStmt->execute(['observation_id' => $observation['observation_id']]);
     $images = $imgStmt->fetchAll();
@@ -37,7 +33,6 @@ for ($i = 1; $i <= 3; $i++) {
       'images' => $images
     ];
   } else {
-    // Pas d'observation trouvée pour cet index, initialiser les données à un tableau vide ou à des valeurs par défaut
     $observations[$i] = [
       'details' => [],
       'images' => []
@@ -213,7 +208,29 @@ for ($i = 1; $i <= 3; $i++) {
       </div>
       <input type="submit" value="Upload">
     </form>
+    <div id="pdfGenerationPopup" style="position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border: 1px solid #ddd; z-index: 1000;">
+        <form action="generate_pdf.php" method="post" target="_blank">
+            <div class="input-group">
+              <textarea hidden name="chantier_id" id="chantier_id_popup" rows="2" cols="50"><?= $chantier_id ?></textarea>
+              <label for="chantier">Chantier:</label>
+              <textarea name="chantierNom" id="chantierNom_popup" rows="2" cols="50"><?= $chantier['description'] ?></textarea>
+            </div>
+            <div class="input-group">
+              <label for="maitreOuvrage">Maître d'Ouvrage:</label>
+              <input type="text" name="maitreOuvrage" id="maitreOuvrage_popup" Value="<?= $chantier['maitreOuvrage'] ?>">
+            </div>
+            <div class="input-group">
+              <label for="maitreOeuvre">Maître d'Œuvre:</label>
+              <input type="text" name="maitreOeuvre" id="maitreOeuvre_popup" value="<?= $chantier['maitreOeuvre'] ?>">
+            </div>
+            <div class="input-group">
+              <label for="coordonnateurSPS">Coordonnateur S.P.S.:</label>
+              <input type="text" name="coordonnateurSPS" id="coordonnateurSPS_popup" Value="Gaël MONGARS">
+            </div>
+            <button type="submit">Générer le PDF</button>
+            <button id ="close-popup-button" name="close-popup-button"type="button" onclick="closePopup()">Fermer</button>
+        </form>
+    </div>
   </div>
 </body>
-
 </html>

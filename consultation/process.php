@@ -59,7 +59,7 @@ function updateFormData($postData, $fileData)
 
     return true;
 }
-
+/*
 function clean_input($data)
 {
     $data = trim($data);
@@ -234,7 +234,6 @@ function getNombreObservations($chantierId)
         return 0;
     }
 }
-
 function generatePdf($postData, $chantierId)
 {
     $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -349,7 +348,8 @@ function generatePdf($postData, $chantierId)
 
     return $pdfFilename;
 }
-
+header("Location: ../mail/pageMail.php?file=" . urlencode($nom_du_fichier));
+exit;
 $pdfFilename = generatePdf($_POST, $chantierId);
 echo "PDF gÃ©nÃ©rÃ©: " . $pdfFilename;
 
@@ -358,5 +358,4 @@ error_log("Observation 2 Data: " . print_r($postData['observation2'], true));
 if (!$result) {
     die("Une erreur s'est produite lors de l'enregistrement des données du formulaire.");
 }
-header("Location: ../mail/pageMail.php?file=" . urlencode($nom_du_fichier));
-exit;
+*/

@@ -3,36 +3,38 @@ var counter = 2;
 var companyValues = [];
 var effectiveValues = [];
 
-window.onload = function () {
-    for (let i = 1; i <= 3; i++) {
-        ["autre", "reunion", "visiteInopinee"].forEach(function (type) {
-            document.getElementById(type + i).addEventListener("change", function () {
-                document.getElementById("autreText" + i).style.display = this.checked && type == "autre" ? "block" : "none";
-            });
-        });
-    }
-
-    document.getElementById('myForm').addEventListener('submit', function (event) {
-        if (!validateForm()) {
-            event.preventDefault();
-        }
-    });
-
-    document.querySelector('form').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter' && e.target.nodeName !== 'TEXTAREA') {
-            e.preventDefault();
-        }
-    });
-    
-    $(document).ready(function () {
-        $('form input').on('keypress', function (e) {
-            if (e.which === 13 && e.target.nodeName !== 'TEXTAREA') {
-                e.preventDefault();
-            }
-        });
-    });
-    
+function openPdfGenerationPopup() {
+    document.getElementById('pdfGenerationPopup').style.display = 'block';
 }
+
+function closePopup() {
+    document.getElementById('pdfGenerationPopup').style.display = 'none';
+}
+
+function handleFormSubmission(event) {
+    if (!validateForm()) {
+        event.preventDefault();
+    } else {
+        var form = document.getElementById('myForm');
+        var formData = new FormData(form);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'process.php', true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                openPdfGenerationPopup();
+            }
+        };
+        xhr.send(formData);
+    }
+}
+
+document.getElementById('myForm').addEventListener('submit', handleFormSubmission);
+
+document.getElementById('pdfGenerationPopup').querySelector('.close-popup-button').addEventListener('click', function () {
+    closePopup();
+});
+
 function validateForm() {
     companyValues = [];
     effectiveValues = [];
@@ -71,90 +73,73 @@ function openTab(evt, tabName) {
     });
     var tabLinks = document.getElementsByClassName("tab-link");
     Array.from(tabLinks).forEach(link => {
-        link.className = link.className.replace(" active", "");
+        link.classList.remove("active");
     });
     document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
+    evt.currentTarget.classList.add("active");
 }
 
 function addObservation(event) {
     event.preventDefault();
+    observationCount++;
+    var newObservationCount = observationCount;
 
-    // Loop pour ajouter 2 nouvelles observations
-    for (let i = 0; i < 1; i++) {
-        observationCount++;
-        var newObservationCount = observationCount;
+    var tabs = document.getElementById("tabs");
+    var newButton = document.createElement("button");
+    newButton.className = "tab-link";
+    newButton.setAttribute("data-tab", 'observation' + newObservationCount);
+    newButton.innerHTML = "Observation " + newObservationCount;
+    newButton.onclick = (event) => openTab(event, 'observation' + newObservationCount);
+    tabs.appendChild(newButton);
 
-        var tabs = document.getElementById("tabs");
-        var newButton = document.createElement("button");
-        newButton.className = "tab-link";
-        newButton.innerHTML = "Observation " + newObservationCount;
-        newButton.onclick = (event) => openTab(event, 'observation' + newObservationCount);
-        tabs.appendChild(newButton);
+    var newDiv = document.createElement("div");
+    newDiv.id = "observation" + newObservationCount;
+    newDiv.className = "tab-content";
+    newDiv.innerHTML = `
+        <label>Type de visite:</label>
+        <div class="radio-buttons">
+            <label for="reunion${newObservationCount}"><input type="radio" id="reunion${newObservationCount}" name="typeVisite${newObservationCount}" value="reunion">Réunion</label>
+            <label for="visiteInopinee${newObservationCount}"><input type="radio" id="visiteInopinee${newObservationCount}" name="typeVisite${newObservationCount}" value="visiteInopinee">Visite inopinée</label>
+            <label for="autre${newObservationCount}"><input type="radio" id="autre${newObservationCount}" name="typeVisite${newObservationCount}" value="autre">Autre</label>
+        </div>
+        <div class="input-group" id="autreText${newObservationCount}" style="display: none;">
+            <label for="autreDescription${newObservationCount}">Précisez:</label>
+            <input type="text" name="autreDescription${newObservationCount}" id="autreDescription${newObservationCount}">
+        </div>
+        <label>Date:</label>
+        <input type="date" name="date${newObservationCount}" id="date${newObservationCount}">
+        <label>Heure:</label>
+        <input type="time" name="heure${newObservationCount}" id="heure${newObservationCount}">
+        <br>
+        <textarea name="observation${newObservationCount}" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..." ></textarea><br>
+        <input type="file" name="photo${newObservationCount}" accept="image/*" ><br>
+        <label for="entreprise${newObservationCount}">Entreprise:</label>
+        <input type="text" name="entreprise${newObservationCount}" id="entreprise${newObservationCount}" ><br>
+        <label for="effectif${newObservationCount}">Effectif:</label>
+        <input type="text" name="effectif${newObservationCount}" id="effectif${newObservationCount}" >
+    `;
 
-        var newDiv = document.createElement("div");
-        newDiv.id = "observation" + newObservationCount;
-        newDiv.className = "tab-content";
-        newDiv.innerHTML = `
-            <label>Type de visite:</label>
-            <div class="radio-buttons">
-                <label for="reunion${newObservationCount}"><input type="radio" id="reunion${newObservationCount}" name="typeVisite${newObservationCount}" value="reunion">Réunion</label>
-                <label for="visiteInopinee${newObservationCount}"><input type="radio" id="visiteInopinee${newObservationCount}" name="typeVisite${newObservationCount}" value="visiteInopinee">Visite inopinée</label>
-                <label for="autre${newObservationCount}"><input type="radio" id="autre${newObservationCount}" name="typeVisite${newObservationCount}" value="autre">Autre</label>
-            </div>
-            <div class="input-group" id="autreText${newObservationCount}" style="display: none;">
-                <label for="autreDescription${newObservationCount}">Précisez:</label>
-                <input type="text" name="autreDescription${newObservationCount}" id="autreDescription${newObservationCount}">
-            </div>
-            <label>Date:</label>
-            <input type="date" name="date${newObservationCount}" id="date${newObservationCount}">
-            <label>Heure:</label>
-            <input type="time" name="heure${newObservationCount}" id="heure${newObservationCount}">
-            <br>
-            <textarea name="observation${newObservationCount}" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..." ></textarea><br>
-            <input type="file" name="photo${newObservationCount}" accept="image/*" ><br>
-            <label for="entreprise${newObservationCount}">Entreprise:</label>
-            <input type="text" name="entreprise${newObservationCount}" id="entreprise${newObservationCount}" ><br>
-            <label for="effectif${newObservationCount}">Effectif:</label>
-            <input type="text" name="effectif${newObservationCount}" id="effectif${newObservationCount}" >
-        `;
-
-        document.getElementById("tabs").after(newDiv);
-
-        // Ajout d'un écouteur d'événements pour gérer l'affichage du champ "Précisez"
-        document.getElementById("autre" + newObservationCount).addEventListener("change", function () {
-            document.getElementById("autreText" + newObservationCount).style.display = this.checked ? "block" : "none";
-        });
-
-        var companyInput = document.getElementById('entreprise' + newObservationCount);
-        var effectiveInput = document.getElementById('effectif' + newObservationCount);
-        if (companyInput && effectiveInput) {
-            companyInput.value = '';
-            effectiveInput.value = '';
-        }
-
-        newButton.click();
-    }
+    document.getElementById("tabs").after(newDiv);
 }
-
 
 function removeObservation(event) {
     event.preventDefault();
     if (observationCount > 1) {
         var tabToDelete = document.getElementById("observation" + observationCount);
-        var buttonToDelete = document.getElementsByClassName("tab-link")[observationCount - 1];
+        var buttonToDelete = document.querySelector('[data-tab="observation' + observationCount + '"]');
         tabToDelete.remove();
         buttonToDelete.remove();
         observationCount--;
     }
 }
+
 function addInput(divName, event) {
     event.preventDefault();
     var newDiv = document.createElement('div');
     newDiv.className = 'personne-input';
 
-    var newInput = document.createElement('input'); // Créez un élément input
-    newInput.type = 'text'; // Assurez-vous qu'il s'agit d'un champ de texte
+    var newInput = document.createElement('input');
+    newInput.type = 'text';
     newInput.name = 'personne' + counter;
     newInput.id = 'personne' + counter;
     newInput.required = true;
@@ -167,7 +152,7 @@ function addInput(divName, event) {
         removeInput(newDiv, event);
     };
 
-    newDiv.appendChild(newInput); // Ajoutez l'élément input à la div
+    newDiv.appendChild(newInput);
     newDiv.appendChild(removeButton);
 
     document.getElementById(divName).appendChild(newDiv);
@@ -179,8 +164,16 @@ function removeInput(element, event) {
     element.parentNode.removeChild(element);
 }
 
-$(document).ready(function () {
-    $('form input').on('keypress', function (e) {
-        return e.which !== 13;
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.nodeName !== 'TEXTAREA') {
+        e.preventDefault();
+    }
+});
+
+document.querySelectorAll('form input').forEach(function (input) {
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && e.target.nodeName !== 'TEXTAREA') {
+            e.preventDefault();
+        }
     });
 });
