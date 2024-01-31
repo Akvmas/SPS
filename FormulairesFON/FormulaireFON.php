@@ -47,7 +47,7 @@
           <label>Type de visite:</label>
           <div class="radio-buttons">
             <label for="reunion"><input type="radio" id="reunion1" name="typeVisite1" value="reunion">Réunion</label>
-            <label for="visiteInopinee"><input type="radio" id="visiteInopinee1" name="typeVisite1" value="visiteInopinee">Visite inopinée</label>
+            <label for="Visite inopinée"><input type="radio" id="Visite inopinée1" name="typeVisite1" value="Visite inopinée">Visite inopinée</label>
             <label for="autre"><input type="radio" id="autre1" name="typeVisite1" value="autre">Autre</label>
           </div>
           <div class="input-group" id="autreText1" style="display: none;">

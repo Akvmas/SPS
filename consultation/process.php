@@ -20,7 +20,7 @@ function updateFormData($postData, $fileData)
     $stmt = $pdo->prepare("UPDATE chantiers SET description = ?, maitreOuvrage = ?, maitreOeuvre = ? WHERE id = ?");
     $stmt->execute([$postData['chantierNom'], $postData['maitreOuvrage'], $postData['maitreOeuvre'], $chantierId]);
 
-    for ($obsIndex = 1; $obsIndex <= 3; $obsIndex++) {
+    for ($obsIndex = 1; $obsIndex <= 8; $obsIndex++) {
         $observationText = $postData['observation' . $obsIndex] ?? null;
 
         if (!empty($observationText)) {

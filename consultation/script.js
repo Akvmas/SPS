@@ -79,47 +79,51 @@ function openTab(evt, tabName) {
     evt.currentTarget.classList.add("active");
 }
 
-function addObservation(event) {
-    event.preventDefault();
-    observationCount++;
-    var newObservationCount = observationCount;
-
+function addObservation() {
     var tabs = document.getElementById("tabs");
-    var newButton = document.createElement("button");
-    newButton.className = "tab-link";
-    newButton.setAttribute("data-tab", 'observation' + newObservationCount);
-    newButton.innerHTML = "Observation " + newObservationCount;
-    newButton.onclick = (event) => openTab(event, 'observation' + newObservationCount);
-    tabs.appendChild(newButton);
+    var newTab = document.createElement("button");
+    newTab.className = "tab-link";
+    newTab.type = "button";
+    newTab.textContent = "Observation " + observationCounter;
+    newTab.onclick = function(event) { openTab(event, 'observation' + observationCounter) };
+    tabs.appendChild(newTab);
 
-    var newDiv = document.createElement("div");
-    newDiv.id = "observation" + newObservationCount;
-    newDiv.className = "tab-content";
-    newDiv.innerHTML = `
+    var partTwo = document.querySelector(".part-two");
+    var newObservation = document.createElement("div");
+    newObservation.id = "observation" + observationCounter;
+    newObservation.className = "tab-content";
+    newObservation.innerHTML = generateObservationContent(observationCounter);
+    partTwo.appendChild(newObservation);
+
+    observationCounter++;
+}
+function generateObservationContent(number) {
+    return `
         <label>Type de visite:</label>
         <div class="radio-buttons">
-            <label for="reunion${newObservationCount}"><input type="radio" id="reunion${newObservationCount}" name="typeVisite${newObservationCount}" value="reunion">Réunion</label>
-            <label for="visiteInopinee${newObservationCount}"><input type="radio" id="visiteInopinee${newObservationCount}" name="typeVisite${newObservationCount}" value="visiteInopinee">Visite inopinée</label>
-            <label for="autre${newObservationCount}"><input type="radio" id="autre${newObservationCount}" name="typeVisite${newObservationCount}" value="autre">Autre</label>
+            <label for="reunion${number}"><input type="radio" id="reunion${number}" name="typeVisite${number}" value="reunion">Réunion</label>
+            <label for="visiteInopinee${number}"><input type="radio" id="visiteInopinee${number}" name="typeVisite${number}" value="visiteInopinee">Visite inopinée</label>
+            <label for="autre${number}"><input type="radio" id="autre${number}" name="typeVisite${number}" value="autre">Autre</label>
         </div>
-        <div class="input-group" id="autreText${newObservationCount}" style="display: none;">
-            <label for="autreDescription${newObservationCount}">Précisez:</label>
-            <input type="text" name="autreDescription${newObservationCount}" id="autreDescription${newObservationCount}">
+        <div class="input-group" id="autreText${number}" style="display: none;">
+            <label for="autreDescription${number}">Précisez:</label>
+            <input type="text" name="autreDescription${number}" id="autreDescription${number}">
         </div>
         <label>Date:</label>
-        <input type="date" name="date${newObservationCount}" id="date${newObservationCount}">
+        <input type="date" name="date${number}" id="date${number}">
         <label>Heure:</label>
-        <input type="time" name="heure${newObservationCount}" id="heure${newObservationCount}">
+        <input type="time" name="heure${number}" id="heure${number}">
         <br>
-        <textarea name="observation${newObservationCount}" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..." ></textarea><br>
-        <input type="file" name="photo${newObservationCount}" accept="image/*" ><br>
-        <label for="entreprise${newObservationCount}">Entreprise:</label>
-        <input type="text" name="entreprise${newObservationCount}" id="entreprise${newObservationCount}" ><br>
-        <label for="effectif${newObservationCount}">Effectif:</label>
-        <input type="text" name="effectif${newObservationCount}" id="effectif${newObservationCount}" >
+        <textarea name="observation${number}" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."></textarea>
+        <br>
+        <input type="file" name="photos${number}[]" accept="image/*" multiple>
+        <br>
+        <label for="entreprise${number}">Entreprise:</label>
+        <input type="text" name="entreprise${number}" id="entreprise${number}">
+        <br>
+        <label for="effectif${number}">Effectif:</label>
+        <input type="text" name="effectif${number}" id="effectif${number}">
     `;
-
-    document.getElementById("tabs").after(newDiv);
 }
 
 function removeObservation(event) {

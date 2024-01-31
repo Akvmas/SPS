@@ -11,7 +11,8 @@ session_start();
 global $pdo;
 $uploadedFiles = $_FILES['photos1'];
 
-function clean_input($data) {
+function clean_input($data)
+{
     return is_null($data) ? '' : htmlspecialchars(stripslashes(trim($data)));
 }
 
@@ -50,7 +51,7 @@ function saveFormData($pdo, $uploadedFiles)
         $autreDescription = isset($_POST['autreDescription' . $obsIndex]) ? clean_input($_POST['autreDescription' . $obsIndex]) : null;
 
         $stmt = $pdo->prepare("INSERT INTO observations (chantier_id, texte, date, heure, entreprise, effectif,observation_number, typeVisite, autreDescription) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$chantierId, $observation, $dateObservation, $heureObservation, $entreprise, $effectif,$obsIndex,$typeVisite, $autreDescription]);
+        $stmt->execute([$chantierId, $observation, $dateObservation, $heureObservation, $entreprise, $effectif, $obsIndex, $typeVisite, $autreDescription]);
         $observationId = $pdo->lastInsertId();
         $observationIds[] = $observationId;
 
@@ -86,12 +87,6 @@ class MYPDF extends TCPDF
         $this->SetY(-15);
         $this->SetFont('helvetica', 'I', 8);
         $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
-    
-        $signatureImagePath = '../images/signature.png'; 
-        $imageWidth = 40; 
-        $imageHeight = 20;
-        $offsetX = 30;
-        $this->Image($signatureImagePath, $this->GetX() - $offsetX, $this->GetY() - 10, $imageWidth, $imageHeight, 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
     }
 }
 
@@ -100,32 +95,31 @@ function generatePdf($postData, $chantierId, $observationIds)
     global $pdo;
     $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-    // Configuration initiale du PDF
+    define('MARGIN_LEFT', 15);
+    define('MARGIN_TOP', 50);
+    define('MARGIN_RIGHT', 15);
+    define('MARGIN_HEADER', 5);
+    define('MARGIN_FOOTER', 10);
+    define('MARGIN_BOTTOM', 25);
+
     $pdf->SetCreator(PDF_CREATOR);
-    $pdf->SetAuthor('Votre Nom');
-    $pdf->SetTitle('Détails du Formulaire');
-    $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+    $pdf->SetAuthor('MONGARS Gael');
+    $pdf->SetTitle('Détails du Chantier');
+
+    $pdf->SetMargins(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT);
+    $pdf->SetHeaderMargin(MARGIN_HEADER);
+    $pdf->SetFooterMargin(MARGIN_FOOTER);
+    $pdf->SetAutoPageBreak(TRUE, MARGIN_BOTTOM);
+
     $pdf->AddPage();
 
-    // En-tête du PDF
-    $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Ln(10);
-    $pdf->MultiCell(0, 10, 'Détails du Chantier', 0, 'C');
-    $pdf->Ln(5);
-
-    // Informations du chantier
     $pdf->SetFont('helvetica', '', 12);
     $pdf->Cell(0, 0, 'Chantier: ' . clean_input($postData['chantier']), 0, 1, 'L');
     $pdf->Cell(0, 0, 'Maître d\'Ouvrage: ' . clean_input($postData['maitreOuvrage']), 0, 1, 'L');
     $pdf->Cell(0, 0, 'Maître d\'Œuvre: ' . clean_input($postData['maitreOeuvre']), 0, 1, 'L');
-    $pdf->Cell(0, 0, 'Coordonnateur S.P.S.: ' . clean_input($postData['coordonnateurSPS']), 0, 1, 'L');
     $pdf->Ln(5);
 
-    // Personnes présentes
-    $pdf->MultiCell(0, 10, 'Personnes Présentes:', 0, 'L');
+    $pdf->MultiCell(0, 10, 'Personne(s) présente(s) :', 0, 'L');
     $stmt = $pdo->prepare("SELECT nom FROM personnes_presentes WHERE chantier_id = ?");
     $stmt->execute([$chantierId]);
     $personnesPresentes = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -145,11 +139,15 @@ function generatePdf($postData, $chantierId, $observationIds)
     $pdf->Line(10, $y, 200, $y);
     $pdf->Ln(2);
 
-    $obsNumber = 1; 
+    $obsNumber = 1;
     foreach ($observationIds as $observationId) {
+        if ($pdf->GetY() + 120 > ($pdf->getPageHeight() - PDF_MARGIN_BOTTOM)) {
+            $pdf->AddPage();
+        }
         $pdf->MultiCell(0, 10, 'Observation ' . $obsNumber . ': ' . clean_input($postData["observation{$obsNumber}"]), 0, 'L');
         $pdf->Ln(5);
-
+        $maxImageWidth = 100;
+        $maxImageHeight = 40;
         $stmt = $pdo->prepare("SELECT image FROM observation_images WHERE observation_id = ?");
         $stmt->execute([$observationId]);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -159,11 +157,11 @@ function generatePdf($postData, $chantierId, $observationIds)
                 $tempImagePath = tempnam(sys_get_temp_dir(), 'img');
                 imagepng($image, $tempImagePath);
                 list($width, $height) = getimagesize($tempImagePath);
-                $ratio = $width / $height;
-                $maxHeight = 60;
-                $newWidth = $ratio * $maxHeight;
-                $pdf->Image($tempImagePath, '', '', $newWidth, $maxHeight, 'PNG', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                $pdf->Ln($maxHeight + 5);
+                $ratio = min($maxImageWidth / $width, $maxImageHeight / $height);
+                $newWidth = $width * $ratio;
+                $newHeight = $height * $ratio;
+                $pdf->Image($tempImagePath, '', '', $newWidth, $newHeight, 'PNG', '', 'T', false, 300, '', false, false, 1, false, false, false);
+                $pdf->Ln($newHeight + 5); 
                 unlink($tempImagePath); 
             }
         }
@@ -196,8 +194,13 @@ function generatePdf($postData, $chantierId, $observationIds)
     $pdf->Ln();
 
     $texte = "Sans remarque de la part de l’entreprise dans un délai de 8 jours, les observations formulées par le Coordonnateur S.P.S. sont réputées acceptées sans réserve.";
-
     $pdf->MultiCell(0, 10, $texte, 0, 'L');
+    $pdf->Ln(20);
+    $signatureImagePath = '../images/signature.png';
+    $imageWidth = 40;
+    $imageHeight = 20;
+    $offsetX = 0;
+    $pdf->Image($signatureImagePath, $pdf->GetX() - $offsetX, $pdf->GetY() - 10, $imageWidth, $imageHeight, 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
     $chantierName = preg_replace("/[^a-zA-Z0-9]/", "_", $postData['chantier']);
     $currentDate = date('Ymd');
     $pdfFilename = __DIR__ . "/../RenduPdf/{$chantierName}_{$currentDate}.pdf";
@@ -214,7 +217,7 @@ function generatePdf($postData, $chantierId, $observationIds)
             }
         }
     }
-    
+
     return $pdfFilename;
 }
 
@@ -229,4 +232,3 @@ if ($result['chantierId']) {
 $_SESSION['pdfFilename'] = $pdfFilename;
 header("Location: ../mail/pageMail.php?file=" . urlencode($pdfFilename));
 die;
-?>

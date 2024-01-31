@@ -78,66 +78,14 @@ function openTab(evt, tabName) {
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
-
-function addObservation(event) {
-    event.preventDefault();
-
-    // Loop pour ajouter 2 nouvelles observations
-    for (let i = 0; i < 1; i++) {
-        observationCount++;
-        var newObservationCount = observationCount;
-
-        var tabs = document.getElementById("tabs");
-        var newButton = document.createElement("button");
-        newButton.className = "tab-link";
-        newButton.innerHTML = "Observation " + newObservationCount;
-        newButton.onclick = (event) => openTab(event, 'observation' + newObservationCount);
-        tabs.appendChild(newButton);
-
-        var newDiv = document.createElement("div");
-        newDiv.id = "observation" + newObservationCount;
-        newDiv.className = "tab-content";
-        newDiv.innerHTML = `
-            <textarea name="observation${newObservationCount}" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..." ></textarea><br>
-            <input type="file" name="photo${newObservationCount}" accept="image/*" ><br>
-            <label for="entreprise${newObservationCount}">Entreprise:</label>
-            <input type="text" name="entreprise${newObservationCount}" id="entreprise${newObservationCount}" ><br>
-            <label for="effectif${newObservationCount}">Effectif:</label>
-            <input type="text" name="effectif${newObservationCount}" id="effectif${newObservationCount}" >
-        `;
-
-        document.getElementById("tabs").after(newDiv);
-
-        var companyInput = document.getElementById('entreprise' + newObservationCount);
-        var effectiveInput = document.getElementById('effectif' + newObservationCount);
-        if (companyInput && effectiveInput) {
-            companyInput.value = '';
-            effectiveInput.value = '';
-        }
-
-        newButton.click();
-    }
-}
-
-
-function removeObservation(event) {
-    event.preventDefault();
-    if (observationCount > 1) {
-        var tabToDelete = document.getElementById("observation" + observationCount);
-        var buttonToDelete = document.getElementsByClassName("tab-link")[observationCount - 1];
-        tabToDelete.remove();
-        buttonToDelete.remove();
-        observationCount--;
-    }
-}
 function addInput(divName, event) {
     event.preventDefault();
     var newDiv = document.createElement('div');
     newDiv.className = 'personne-input';
 
-    var newInput = document.createElement('input'); // Créez un élément input
-    newInput.type = 'text'; // Assurez-vous qu'il s'agit d'un champ de texte
-    newInput.name = 'personne[]'; // Supprimez "+ counter" ici
+    var newInput = document.createElement('input'); 
+    newInput.type = 'text'; 
+    newInput.name = 'personne[]'; 
     newInput.id = 'personne' + counter;
     newInput.required = true;
 
@@ -149,7 +97,7 @@ function addInput(divName, event) {
         removeInput(newDiv, event);
     };
 
-    newDiv.appendChild(newInput); // Ajoutez l'élément input à la div
+    newDiv.appendChild(newInput); 
     newDiv.appendChild(removeButton);
 
     document.getElementById(divName).appendChild(newDiv);
