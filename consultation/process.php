@@ -9,8 +9,7 @@ global $pdo;
 $chantierId = $_POST['chantier_id'];
 
 
-function updateFormData($postData, $fileData)
-{
+function updateFormData($postData, $fileData) {
     global $pdo;
     if (!isset($postData['chantier_id'])) {
         die("L'ID du chantier est manquant.");
@@ -21,6 +20,7 @@ function updateFormData($postData, $fileData)
     $stmt->execute([$postData['chantierNom'], $postData['maitreOuvrage'], $postData['maitreOeuvre'], $chantierId]);
 
     for ($obsIndex = 1; $obsIndex <= 8; $obsIndex++) {
+        $photoColumnName = 'photo' . $obsIndex;
         $observationText = $postData['observation' . $obsIndex] ?? null;
 
         if (!empty($observationText)) {
@@ -34,34 +34,39 @@ function updateFormData($postData, $fileData)
 
             $stmt_check = $pdo->prepare("SELECT observation_id FROM observations WHERE chantier_id = ? AND observation_number = ?");
             $stmt_check->execute([$chantierId, $obsIndex]);
-
             if ($row = $stmt_check->fetch()) {
-                $stmt = $pdo->prepare("UPDATE observations SET texte = ?, entreprise = ?, effectif = ?, typeVisite = ?, autreDescription = ?, date = ?, heure = ? WHERE chantier_id = ? AND observation_number = ?");
-                $stmt->execute([$observationText, $entreprise, $effectif, $typeVisite, $autreDescription, $formattedDate, $heure, $chantierId, $obsIndex]);
                 $observationId = $row['observation_id'];
+                $stmt = $pdo->prepare("UPDATE observations SET texte = ?, entreprise = ?, effectif = ?, typeVisite = ?, autreDescription = ?, date = ?, heure = ? WHERE observation_id = ?");
+                $stmt->execute([$observationText, $entreprise, $effectif, $typeVisite, $autreDescription, $formattedDate, $heure, $observationId]);
             } else {
                 $stmt = $pdo->prepare("INSERT INTO observations (chantier_id, texte, entreprise, effectif, observation_number, typeVisite, autreDescription, date, heure) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$chantierId, $observationText, $entreprise, $effectif, $obsIndex, $typeVisite, $autreDescription, $formattedDate, $heure]);
                 $observationId = $pdo->lastInsertId();
             }
-
+    
             $photoColumnName = 'photo' . $obsIndex;
             if (isset($fileData[$photoColumnName]) && is_array($fileData[$photoColumnName]['tmp_name'])) {
-                foreach ($fileData[$photoColumnName]['tmp_name'] as $fileTmpName) {
-                    if (file_exists($fileTmpName))
-                        $photo = file_get_contents($fileTmpName);
-                    $insertImgStmt = $pdo->prepare("INSERT INTO observation_images (observation_id, image) VALUES (?, ?)");
-                    $insertImgStmt->execute([$observationId, $photo]);
+                foreach ($fileData[$photoColumnName]['tmp_name'] as $index => $fileTmpName) {
+                    if ($fileData[$photoColumnName]['error'][$index] === UPLOAD_ERR_OK) {
+                        if (is_uploaded_file($fileTmpName)) {
+                            $photo = file_get_contents($fileTmpName);
+                            $insertImgStmt = $pdo->prepare("INSERT INTO observation_images (observation_id, image) VALUES (?, ?)");
+                            $insertImgStmt->execute([$observationId, $photo]);
+                        }
+                    }
                 }
             }
         }
+    
+        return true;
     }
-
-    return true;
 }
-/*
+
 function clean_input($data)
 {
+    if ($data === null) {
+        return '';
+    }
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
@@ -348,14 +353,13 @@ function generatePdf($postData, $chantierId)
 
     return $pdfFilename;
 }
-header("Location: ../mail/pageMail.php?file=" . urlencode($nom_du_fichier));
-exit;
 $pdfFilename = generatePdf($_POST, $chantierId);
-echo "PDF gÃ©nÃ©rÃ©: " . $pdfFilename;
+echo "PDF généré: " . $pdfFilename;
 
 $result = updateFormData($_POST, $_FILES);
-error_log("Observation 2 Data: " . print_r($postData['observation2'], true));
 if (!$result) {
     die("Une erreur s'est produite lors de l'enregistrement des données du formulaire.");
 }
-*/
+
+error_log("Observation 2 Data: " . print_r($_POST['observation2'], true));
+exit;

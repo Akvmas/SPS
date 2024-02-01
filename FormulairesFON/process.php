@@ -174,7 +174,7 @@ function generatePdf($postData, $chantierId, $observationIds)
         }
         if (!empty($postData["typeVisite{$obsNumber}"])) {
             $typeVisite = clean_input($postData["typeVisite{$obsNumber}"]);
-            $pdf->Cell(0, 0, 'Type de Visite: ' . $typeVisite, 0, 1, '');
+            $pdf->Cell(0, 0, 'Type de visite: ' . $typeVisite, 0, 1, '');
         }
         if ($postData["typeVisite{$obsNumber}"] === 'autre' && !empty($postData["autreDescription{$obsNumber}"])) {
             $pdf->Cell(0, 0, 'Description: ' . clean_input($postData["autreDescription{$obsNumber}"]), 0, 1, '');
