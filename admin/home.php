@@ -37,21 +37,18 @@ if (!isset($_SESSION["username"])) {
               <br>
               </br>
             </div>
-            <div class="login-wrap p-0">
-              <div class="form-group">
-                <button name="Formulaires VIC" class="form-control btn btn-primary submit px-3" id=FormulaireVIC value="Formulaire" onclick="self.location.href='../formulairesVIC/FormulairesVIC.php'">Formulaire VIC </button>
-                <br>
-                </br>
-                <button name="Formulaires FON" class="form-control btn btn-primary submit px-3" id="FormulaireFON" value="Formulaire" onclick="self.location.href='../FormulairesFON/FormulaireFON.php'">Formulaire FON</button>
-                <br>
-                </br>
-                <button name="Formulaires FON Consultation" class="form-control btn btn-primary submit px-3" id="Fonconsult" value="Formulaire" onclick="self.location.href='../consultation/RechercheFon.php'">Consultation Fiche d'observation ou de notification</button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-    </div>
+      <div class="login-wrap p-0">
+        <div class="form-group">
+          <button name="Formulaires VIC" class="form-control btn btn-primary submit px-3" id=FormulaireVIC value="Formulaire" onclick="self.location.href='formulairesVIC/FormulairesVIC.php'">Visite d'inspection commune</button>
+          <br></br>
+          <button name="Formulaires FON" class="form-control btn btn-primary submit px-3" id="FormulaireFON" value="Formulaire" onclick="self.location.href='FormulairesFON/FormulaireFON.php'">Fiche d'observation ou de notification</button>
+          <br></br>
+          <button name="Formulaires FON Consultation" class="form-control btn btn-primary submit px-3" id="Fonconsult" value="Formulaire" onclick="self.location.href='consultation/RechercheFon.php'">Consultation Fiche d'observation ou de notification</button>
+        </div>
+      </div>
     </div>
   </section>
   <script src='../js/jquery.min.js'></script>
