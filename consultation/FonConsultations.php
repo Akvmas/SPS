@@ -60,6 +60,10 @@ $stmt->bindParam(':chantier_id', $chantier_id);
 $stmt->execute();
 $observations = $stmt->fetchAll();
 
+$stmt = $pdo->prepare("SELECT observation_id FROM observations WHERE chantier_id = :chantier_id ORDER BY observation_number");
+$stmt->bindParam(':chantier_id', $chantier_id);
+$stmt->execute();
+$observationsIDs = $stmt->fetchAll();
 ?>
 
 
@@ -114,14 +118,18 @@ $observations = $stmt->fetchAll();
         </div>
         <br>
         <?php foreach ($observations as $obs) : ?>
+          <?php
+          $key = $obs['observation_number'] - 1;
+          ?>
           <div id="observation<?= $obs['observation_number'] ?>" class="tab-content" style="<?= $obs['observation_number'] == 1 ? 'display: block;' : 'display: none;' ?>">
+          <input type="hidden" name="observation_id<?= $obs['observation_number'] ?>" value="<?= $observationsIDs[$key]['observation_id'] ?>">
             <label for="type de visite">Type de visite:</label>
             <div class="radio-buttons">
               <label for="reunion<?= $obs['observation_number'] ?>">
                 <input type="radio" id="reunion<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="reunion" <?= $obs['typeVisite'] == 'reunion' ? 'checked' : '' ?>> Réunion
               </label>
               <label for="visiteInopinee<?= $obs['observation_number'] ?>">
-                <input type="radio" id="visiteInopinee<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="visiteInopinee" <?= $obs['typeVisite'] == 'visiteInopinee' ? 'checked' : '' ?>> Visite inopinée
+                <input type="radio" id="visiteInopinee<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="Visite inopinée" <?= $obs['typeVisite'] == 'Visite inopinée' ? 'checked' : '' ?>> Visite inopinée
               </label>
               <label for="autre<?= $obs['observation_number'] ?>">
                 <input type="radio" id="autre<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="autre" <?= $obs['typeVisite'] == 'autre' ? 'checked' : '' ?>> Autre
@@ -154,7 +162,6 @@ $observations = $stmt->fetchAll();
             <br>
           </div>
         <?php endforeach; ?>
-
       </div>
       <div class="text-divider"></div>
       <p>Sans remarque de la part de l’entreprise dans un délai de 8 jours, les observations formulées par le Coordonnateur S.P.S. sont réputées acceptées sans réserve.</p>
@@ -166,6 +173,7 @@ $observations = $stmt->fetchAll();
           <img src="../images/signature.png" width="220" height="100">
         </div>
       </div>
+      <input type="hidden" name="last_observation_id" id="last_observation_id" value="">
       <input type="submit" value="Upload">
   </div>
   </form>
@@ -241,9 +249,15 @@ $observations = $stmt->fetchAll();
           chantier_id: chantierId
         },
         success: function(response) {
-          console.log("Nouvel onglet créé avec succès : ", response);
-          location.reload();
+          var responseData = JSON.parse(response);
+          if (responseData.last_observation_id) {
+            $('#last_observation_id').val(responseData.last_observation_id);
+            location.reload();
+          } else {
+            console.error("L'ID de la dernière observation n'a pas été reçu.");
+          }
         },
+
         error: function(xhr, status, error) {
           console.error("Une erreur s'est produite: " + error);
         }

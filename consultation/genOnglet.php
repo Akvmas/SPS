@@ -12,9 +12,11 @@ $insert = $pdo->prepare("INSERT INTO observations (chantier_id, observation_numb
 $insert->bindParam(':chantier_id', $chantier_id);
 $insert->bindParam(':observation_number', $num_observation);
 $insert->execute();
+$lastObservationId = $pdo->lastInsertId();
 echo json_encode([
     'status' => 'success',
     'message' => 'Nouvelle observation créée avec succès.',
-    'observation_number' => $num_observation
+    'observation_number' => $num_observation,
+    'last_observation_id' => $lastObservationId 
 ]);
 ?>
