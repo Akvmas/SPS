@@ -119,12 +119,19 @@ function generatePdf($postData, $chantierId, $observationIds)
     $pdf->Cell(0, 0, 'Maître d\'Œuvre : ' . clean_input($postData['maitreOeuvre']), 0, 1, 'L');
     $pdf->Ln(5);
 
-    $pdf->MultiCell(0, 10, 'Personne(s) présente(s) :', 0, 'L');
+    $pdf->SetFont('helvetica', 'B', 10);
     $stmt = $pdo->prepare("SELECT nom FROM personnes_presentes WHERE chantier_id = ?");
     $stmt->execute([$chantierId]);
     $personnesPresentes = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    foreach ($personnesPresentes as $nom) {
-        $pdf->Cell(0, 0, clean_input($nom), 0, 1, 'L');
+
+    $nomsPersonnesPresentes = implode(', ', array_map('clean_input', $personnesPresentes));
+
+    if (!empty($nomsPersonnesPresentes)) {
+        $intitule = 'Personne(s) présente(s) : ';
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->Cell(0, 10, $intitule . $nomsPersonnesPresentes, 0, 1, 'L');
+    } else {
+        $pdf->Cell(0, 10, 'Personne(s) présente(s) : Aucune', 0, 1, 'L');
     }
     $pdf->Ln(5);
     $y = $pdf->GetY();
@@ -144,7 +151,13 @@ function generatePdf($postData, $chantierId, $observationIds)
         if ($pdf->GetY() + 120 > ($pdf->getPageHeight() - PDF_MARGIN_BOTTOM)) {
             $pdf->AddPage();
         }
-        $pdf->MultiCell(0, 10, 'Observation ' . $obsNumber . ': ' . clean_input($postData["observation{$obsNumber}"]), 0, 'L');
+        $titreObservation = 'Observation ' . $obsNumber . ': ';
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->Cell(0, 10, $titreObservation, 0, 1, 'L');
+
+        $texteObservation = clean_input($postData["observation{$obsNumber}"]);
+        $pdf->SetFont('helvetica', '', 10);
+        $pdf->MultiCell(0, 10, $texteObservation, 0, 'L');
         $pdf->Ln(5);
         $maxImageWidth = 100;
         $maxImageHeight = 40;
@@ -161,8 +174,8 @@ function generatePdf($postData, $chantierId, $observationIds)
                 $newWidth = $width * $ratio;
                 $newHeight = $height * $ratio;
                 $pdf->Image($tempImagePath, '', '', $newWidth, $newHeight, 'PNG', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                $pdf->Ln($newHeight + 5); 
-                unlink($tempImagePath); 
+                $pdf->Ln($newHeight + 5);
+                unlink($tempImagePath);
             }
         }
 

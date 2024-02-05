@@ -26,16 +26,6 @@
           <label for="coordonnateurSPS">Coordonnateur S.P.S.:</label>
           <input type="text" name="coordonnateurSPS" id="coordonnateurSPS" Value="Gaël MONGARS">
         </div>
-        <div class="input-group">
-          <label>Personnes présentes:</label>
-          <div id="dynamicInput">
-            <div class="personne-input">
-              <input type="text" name="personne[]" id="personne1">
-              <button type="button" class="remove-button" onclick="removeInput(this,event)">x</button>
-              <button type="button" onclick="addInput('dynamicInput',event)">+</button>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="text-divider"></div>
       <div class="part-two">
@@ -44,6 +34,9 @@
         </div>
         <br>
         <div id="observation1" class="tab-content" style="display: block;">
+          <label>Personnes présentes:</label>
+          <br>
+          <textarea name="personne" id ="personne" placeholder="N'oubliez pas de sauter une ligne pour chaque personne"></textarea>
           <label>Type de visite:</label>
           <div class="radio-buttons">
             <label for="reunion"><input type="radio" id="reunion1" name="typeVisite1" value="reunion">Réunion</label>
@@ -58,6 +51,7 @@
           <input type="date" name="date1" id="date1">
           <label>Heure:</label>
           <input type="time" name="heure1" id="heure1">
+          <label>Observation:</label>
           <br>
           <textarea name="observation1" rows="5" cols="50" maxlength="1000" placeholder="Saisissez votre observation ici..."></textarea>
           <br>

@@ -77,7 +77,7 @@ $observationsIDs = $stmt->fetchAll();
 
 <body>
   <div class="container">
-    <form id="myForm" action="process.php" method="POST" enctype="multipart/form-data">
+    <div id="myForm">
       <div class="part-one">
         <div class="input-group">
           <textarea hidden name="chantier_id" id="chantier_id" rows="2" cols="50"><?= $chantier_id ?></textarea>
@@ -122,61 +122,56 @@ $observationsIDs = $stmt->fetchAll();
           $key = $obs['observation_number'] - 1;
           ?>
           <div id="observation<?= $obs['observation_number'] ?>" class="tab-content" style="<?= $obs['observation_number'] == 1 ? 'display: block;' : 'display: none;' ?>">
-          <input type="hidden" name="observation_id<?= $obs['observation_number'] ?>" value="<?= $observationsIDs[$key]['observation_id'] ?>">
-            <label for="type de visite">Type de visite:</label>
-            <div class="radio-buttons">
-              <label for="reunion<?= $obs['observation_number'] ?>">
-                <input type="radio" id="reunion<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="reunion" <?= $obs['typeVisite'] == 'reunion' ? 'checked' : '' ?>> Réunion
-              </label>
-              <label for="visiteInopinee<?= $obs['observation_number'] ?>">
-                <input type="radio" id="visiteInopinee<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="Visite inopinée" <?= $obs['typeVisite'] == 'Visite inopinée' ? 'checked' : '' ?>> Visite inopinée
-              </label>
-              <label for="autre<?= $obs['observation_number'] ?>">
-                <input type="radio" id="autre<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="autre" <?= $obs['typeVisite'] == 'autre' ? 'checked' : '' ?>> Autre
-              </label>
-            </div>
-            <div class="input-group" id="autreText<?= $obs['observation_number'] ?>" style="<?= $obs['typeVisite'] == 'autre' ? 'display: block;' : 'display: none;' ?>">
-              <label for="autredescription<?= $obs['observation_number'] ?>">Précisez:</label>
-              <input type="text" name="autreDescription<?= $obs['observation_number'] ?>" value="<?= $obs['autreDescription'] ?>">
-            </div>
-            <label for="date">Date:</label>
-            <input type="date" name="date<?= $obs['observation_number'] ?>" value="<?= $obs['date'] ?>">
-            <label for="heure">Heure:</label>
-            <input type="time" name="heure<?= $obs['observation_number'] ?>" value="<?= $obs['heure'] ?>">
-            <label for="observation">Observation:</label>
-            <textarea name="observation<?= $obs['observation_number'] ?>" rows="5" cols="50" maxlength="1000"><?= $obs['texte'] ?></textarea>
+            <form action="process.php?observation_number=<?= $obs['observation_number'] ?>" method="POST" enctype="multipart/form-data">
+              <input type="hidden"name="chantierNom" id="chantierNom"value = "<?= $chantier['description'] ?>">
+              <input type="hidden" name="chantier_id" value="<?= $chantier_id ?>">
+              <input type="hidden" name="observation_id" value="<?= $obs['observation_id'] ?>">
+              <label for="personnesPresentes<?= $obs['observation_number'] ?>">Personnes présentes:</label>
+              <textarea name="personnesPresentes<?= $obs['observation_number'] ?>" ><?= isset($personnes['details']) ? implode(", ", array_column($personnes['details'], 'nom')) : "" ?></textarea>
+              <label for="type de visite">Type de visite:</label>
+              <div class="radio-buttons">
+                <label for="reunion<?= $obs['observation_number'] ?>">
+                  <input type="radio" id="reunion<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="reunion" <?= $obs['typeVisite'] == 'reunion' ? 'checked' : '' ?>> Réunion
+                </label>
+                <label for="visiteInopinee<?= $obs['observation_number'] ?>">
+                  <input type="radio" id="visiteInopinee<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="Visite inopinée" <?= $obs['typeVisite'] == 'Visite inopinée' ? 'checked' : '' ?>> Visite inopinée
+                </label>
+                <label for="autre<?= $obs['observation_number'] ?>">
+                  <input type="radio" id="autre<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="autre" <?= $obs['typeVisite'] == 'autre' ? 'checked' : '' ?>> Autre
+                </label>
+              </div>
+              <div class="input-group" id="autreText<?= $obs['observation_number'] ?>" style="<?= $obs['typeVisite'] == 'autre' ? 'display: block;' : 'display: none;' ?>">
+                <label for="autredescription<?= $obs['observation_number'] ?>">Précisez:</label>
+                <input type="text" name="autreDescription<?= $obs['observation_number'] ?>" value="<?= $obs['autreDescription'] ?>">
+              </div>
+              <label for="date">Date:</label>
+              <input type="date" name="date<?= $obs['observation_number'] ?>" value="<?= $obs['date'] ?>">
+              <label for="heure">Heure:</label>
+              <input type="time" name="heure<?= $obs['observation_number'] ?>" value="<?= $obs['heure'] ?>">
+              <label for="observation">Observation:</label>
+              <textarea name="observation<?= $obs['observation_number'] ?>" rows="5" cols="50" maxlength="1000"><?= $obs['texte'] ?></textarea>
 
-            <?php if (!empty($observation_images[$obs['observation_number']])) : ?>
-              <?php foreach ($observation_images[$obs['observation_number']] as $image) : ?>
-                <img src="data:image/jpeg;base64,<?= $image['image_base64'] ?>" alt="Photo d'observation <?= $obs['observation_number'] ?>" />
-              <?php endforeach; ?>
-            <?php else : ?>
-              <input type="file" name="photo[<?= $obs['observation_number'] ?>]" accept="image/*" multiple>
-            <?php endif; ?>
+              <?php if (!empty($observation_images[$obs['observation_number']])) : ?>
+                <?php foreach ($observation_images[$obs['observation_number']] as $image) : ?>
+                  <img src="data:image/jpeg;base64,<?= $image['image_base64'] ?>" alt="Photo d'observation <?= $obs['observation_number'] ?>" />
+                <?php endforeach; ?>
+              <?php else : ?>
+                <input type="file" name="photo[<?= $obs['observation_number'] ?>]" accept="image/*" multiple>
+              <?php endif; ?>
 
-            <label for="entreprise<?= $obs['observation_number'] ?>">Entreprise:</label>
-            <input type="text" name="entreprise<?= $obs['observation_number'] ?>" value="<?= $obs['entreprise'] ?>">
-            <br>
-            <label for="effectif<?= $obs['observation_number'] ?>">Effectif:</label>
-            <input type="text" name="effectif<?= $obs['observation_number'] ?>" value="<?= $obs['effectif'] ?>">
-            <br>
+              <label for="entreprise<?= $obs['observation_number'] ?>">Entreprise:</label>
+              <input type="text" name="entreprise<?= $obs['observation_number'] ?>" value="<?= $obs['entreprise'] ?>">
+              <br>
+              <label for="effectif<?= $obs['observation_number'] ?>">Effectif:</label>
+              <input type="text" name="effectif<?= $obs['observation_number'] ?>" value="<?= $obs['effectif'] ?>">
+              <br>
+              <input type="submit" value="Enregistrer Observation <?= $obs['observation_number'] ?>">
+            </form>
           </div>
         <?php endforeach; ?>
       </div>
-      <div class="text-divider"></div>
-      <p>Sans remarque de la part de l’entreprise dans un délai de 8 jours, les observations formulées par le Coordonnateur S.P.S. sont réputées acceptées sans réserve.</p>
-      <div class="part-three">
-        <div class="column1">
-          <label for="coordonnateurSPS_copy">Le Coordonnateur S.P.S :</label>
-          <input type="text" name="coordonnateurSPS_copy" id="coordonnateurSPS_copy" Value="Gaël MONGARS">
-          <label for="signature">Signature:</label>
-          <img src="../images/signature.png" width="220" height="100">
-        </div>
-      </div>
-      <input type="hidden" name="last_observation_id" id="last_observation_id" value="">
-      <input type="submit" value="Upload">
+    </div>
   </div>
-  </form>
   </div>
 </body>
 <script>
@@ -264,8 +259,7 @@ $observationsIDs = $stmt->fetchAll();
       });
     });
   });
-  $(document).ready(function() {
-    $('.delete-observation').click(function(e) {
+  $(document).on('click', '.delete-observation', function(e) {
       e.preventDefault();
       var observationNumber = $(this).data('observation-number');
       var chantierId = $('#chantier_id').val();
@@ -286,7 +280,6 @@ $observationsIDs = $stmt->fetchAll();
         }
       });
     });
-  });
 </script>
 
 </html>
