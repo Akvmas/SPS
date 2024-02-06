@@ -12,8 +12,8 @@ $stmt->bindParam(':chantier_id', $chantier_id, PDO::PARAM_INT);
 $stmt->execute();
 $chantier = $stmt->fetch();
 
-$stmt = $pdo->prepare("SELECT * FROM personnes_presentes WHERE chantier_id = :chantier_id");
-$stmt->bindParam(':chantier_id', $chantier_id, PDO::PARAM_INT);
+$stmt = $pdo->prepare("SELECT * FROM personnes_presentes WHERE observation_id = :observation_id");
+$stmt->bindParam(':observation_id', $observation['observation_id'], PDO::PARAM_INT);
 $stmt->execute();
 $personnes = $stmt->fetchAll();
 $observations = [];
@@ -96,16 +96,6 @@ $observationsIDs = $stmt->fetchAll();
           <label for="coordonateursps">Coordonnateur S.P.S.:</label>
           <input type="text" name="coordonnateurSPS" id="coordonnateurSPS" Value="Gaël MONGARS">
         </div>
-        <div class="input-group">
-          <label for="personnespresentes">Personnes présentes:</label>
-          <div id="dynamicInput">
-            <div class="personne-input">
-              <input type="text" name="personne1" id="personne1">
-              <button type="button" class="remove-button" onclick="removeInput(this,event)">x</button>
-              <button type="button" onclick="addInput('dynamicInput',event)">+</button>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="text-divider"></div>
       <div class="part-two">
@@ -123,12 +113,16 @@ $observationsIDs = $stmt->fetchAll();
           ?>
           <div id="observation<?= $obs['observation_number'] ?>" class="tab-content" style="<?= $obs['observation_number'] == 1 ? 'display: block;' : 'display: none;' ?>">
             <form action="process.php?observation_number=<?= $obs['observation_number'] ?>" method="POST" enctype="multipart/form-data">
-              <input type="hidden"name="chantierNom" id="chantierNom"value = "<?= $chantier['description'] ?>">
+              <input type="hidden" name="chantierNom" id="chantierNom" value="<?= $chantier['description'] ?>">
               <input type="hidden" name="chantier_id" value="<?= $chantier_id ?>">
               <input type="hidden" name="observation_id" value="<?= $obs['observation_id'] ?>">
               <label for="personnesPresentes<?= $obs['observation_number'] ?>">Personnes présentes:</label>
-              <textarea name="personnesPresentes<?= $obs['observation_number'] ?>" ><?= isset($personnes['details']) ? implode(", ", array_column($personnes['details'], 'nom')) : "" ?></textarea>
-              <label for="type de visite">Type de visite:</label>
+              <?php
+              $stmt = $pdo->prepare("SELECT nom FROM personnes_presentes WHERE observation_id = ?");
+              $stmt->execute([$obs['observation_id']]);
+              $personnesPresentes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+              ?>
+              <textarea name="personnesPresentes<?= $obs['observation_number'] ?>" rows="4" cols="50"><?= implode("\n", $personnesPresentes) ?></textarea> <label for="type de visite">Type de visite:</label>
               <div class="radio-buttons">
                 <label for="reunion<?= $obs['observation_number'] ?>">
                   <input type="radio" id="reunion<?= $obs['observation_number'] ?>" name="typeVisite<?= $obs['observation_number'] ?>" value="reunion" <?= $obs['typeVisite'] == 'reunion' ? 'checked' : '' ?>> Réunion
@@ -156,7 +150,7 @@ $observationsIDs = $stmt->fetchAll();
                   <img src="data:image/jpeg;base64,<?= $image['image_base64'] ?>" alt="Photo d'observation <?= $obs['observation_number'] ?>" />
                 <?php endforeach; ?>
               <?php else : ?>
-                <input type="file" name="photo[<?= $obs['observation_number'] ?>]" accept="image/*" multiple>
+                <input type="file" name="photo[]" accept="image/*" multiple>
               <?php endif; ?>
 
               <label for="entreprise<?= $obs['observation_number'] ?>">Entreprise:</label>
@@ -260,26 +254,26 @@ $observationsIDs = $stmt->fetchAll();
     });
   });
   $(document).on('click', '.delete-observation', function(e) {
-      e.preventDefault();
-      var observationNumber = $(this).data('observation-number');
-      var chantierId = $('#chantier_id').val();
+    e.preventDefault();
+    var observationNumber = $(this).data('observation-number');
+    var chantierId = $('#chantier_id').val();
 
-      $.ajax({
-        url: 'deleteObservation.php',
-        type: 'POST',
-        data: {
-          observationNumber: observationNumber,
-          chantier_id: chantierId
-        },
-        success: function(response) {
-          console.log("Observation supprimée avec succès : ", response);
-          location.reload();
-        },
-        error: function(xhr, status, error) {
-          console.error("Une erreur s'est produite lors de la suppression : " + error);
-        }
-      });
+    $.ajax({
+      url: 'deleteObservation.php',
+      type: 'POST',
+      data: {
+        observationNumber: observationNumber,
+        chantier_id: chantierId
+      },
+      success: function(response) {
+        console.log("Observation supprimée avec succès : ", response);
+        location.reload();
+      },
+      error: function(xhr, status, error) {
+        console.error("Une erreur s'est produite lors de la suppression : " + error);
+      }
     });
+  });
 </script>
 
 </html>

@@ -19,16 +19,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Une erreur s'est produite lors du traitement de l'observation.";
     }
 }
-function processSingleObservation($obsNumber, $chantierId, $obsIndex, $postData, $fileData) {
+function processSingleObservation($obsNumber, $chantierId, $obsIndex, $postData, $fileData)
+{
     global $pdo;
     $obsIndex = $postData['observation_id'];
-    $observationText = clean_input($postData['observation'. $obsNumber]);
-    $typeVisite = clean_input($postData['typeVisite'. $obsNumber]);
+    $observationText = clean_input($postData['observation' . $obsNumber]);
+    $typeVisite = clean_input($postData['typeVisite' . $obsNumber]);
     $autreDescription = clean_input($postData['autreDescription'] ?? '');
-    $date = clean_input($postData['date'.$obsNumber]);
-    $heure = clean_input($postData['heure'.$obsNumber]);
-    $entreprise = clean_input($postData['entreprise'.$obsNumber]);
-    $effectif = clean_input($postData['effectif'.$obsNumber]);
+    $date = clean_input($postData['date' . $obsNumber]);
+    $heure = clean_input($postData['heure' . $obsNumber]);
+    $entreprise = clean_input($postData['entreprise' . $obsNumber]);
+    $effectif = clean_input($postData['effectif' . $obsNumber]);
 
     $existingObsStmt = $pdo->prepare("SELECT COUNT(*) FROM observations WHERE chantier_id = ? AND observation_number = ?");
     $existingObsStmt->execute([$chantierId, $obsNumber]);
@@ -37,39 +38,33 @@ function processSingleObservation($obsNumber, $chantierId, $obsIndex, $postData,
     if ($observationExists) {
         $stmt = $pdo->prepare("UPDATE observations SET texte = ?, typeVisite = ?, autreDescription = ?, date = ?, heure = ?, entreprise = ?, effectif = ? WHERE chantier_id = ? AND observation_number = ?");
         $stmt->execute([$observationText, $typeVisite, $autreDescription, $date, $heure, $entreprise, $effectif, $chantierId, $obsNumber]);
+        $obsID = $obsIndex;
     } else {
         $stmt = $pdo->prepare("INSERT INTO observations (chantier_id, observation_number, texte, typeVisite, autreDescription, date, heure, entreprise, effectif) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$chantierId, $obsNumber, $observationText, $typeVisite, $autreDescription, $date, $heure, $entreprise, $effectif]);
+        $obsID = $pdo->lastInsertId();
     }
-
-    if (isset($fileData['photo']['tmp_name']) && is_array($fileData['photo']['tmp_name'])) {
-        foreach ($fileData['photo']['tmp_name'] as $index => $tmpName) {
-            if ($tmpName && file_exists($tmpName)) {
-                processImageForObservation($obsIndex, $tmpName);
+    if (isset($postData['personnesPresentes' . $obsNumber]) && !empty($postData['personnesPresentes' . $obsNumber])) {
+        $personnesPresentes = explode("\n", str_replace("\r", "", $postData['personnesPresentes' . $obsNumber]));
+        foreach ($personnesPresentes as $personne) {
+            $personne = clean_input($personne);
+            if (!empty($personne)) {
+                $stmt = $pdo->prepare("INSERT INTO personnes_presentes (observation_id, nom) VALUES (?, ?)");
+                $stmt->execute([$obsIndex, $personne]);
             }
         }
     }
-
+    if (isset($fileData['photo']['tmp_name']) && is_array($fileData['photo']['tmp_name'])) {
+        foreach ($fileData['photo']['tmp_name'] as $tmpName) {
+            if ($tmpName && file_exists($tmpName)) {
+                processImageForObservation($obsID, $tmpName);
+            }
+        }
+    }
     return true;
 }
-
-function processImageForObservation($obsIndex, $fileTmpName) {
-    global $pdo;
-    $photo = file_get_contents($fileTmpName);
-    if ($photo === false) {
-        echo "Impossible de lire le fichier image.";
-        return;
-    }
-    if (!isValidImage($photo)) {
-        echo "Fichier image non valide.";
-        return;
-    }
-
-    // Insérer l'image dans la table observation_images avec l'ID de l'observation
-    $insertImgStmt = $pdo->prepare("INSERT INTO observation_images (observation_id, image) VALUES (?, ?)");
-    $insertImgStmt->execute([$obsIndex, $photo]);
-}
-function processImages($obsIndex, $fileTmpName) {
+function processImageForObservation($obsID, $fileTmpName)
+{
     global $pdo;
     $photo = file_get_contents($fileTmpName);
     if ($photo === false) {
@@ -81,10 +76,7 @@ function processImages($obsIndex, $fileTmpName) {
         return;
     }
     $insertImgStmt = $pdo->prepare("INSERT INTO observation_images (observation_id, image) VALUES (?, ?)");
-    if (!$insertImgStmt->execute([$obsIndex, $photo])) {
-        echo "Erreur lors de l'insertion de l'image : ";
-        print_r($insertImgStmt->errorInfo());
-    }
+    $insertImgStmt->execute([$obsID, $photo]);
 }
 function clean_input($data)
 {
@@ -104,7 +96,8 @@ function isValidImage($blob)
     return in_array($mime, $allowedMimes);
 }
 
-function getImagePathsForObservation($chantierId, $obsNumber) {
+function getImagePathsForObservation($chantierId, $obsNumber)
+{
     global $pdo;
 
     $obsStmt = $pdo->prepare("SELECT observation_id FROM observations WHERE chantier_id = ? AND observation_number = ?");
@@ -134,7 +127,8 @@ function getImagePathsForObservation($chantierId, $obsNumber) {
     return $imagePaths;
 }
 
-function getImageFromDatabase($obsIndex) {
+function getImageFromDatabase($obsIndex)
+{
     global $pdo;
 
     $stmt = $pdo->prepare("SELECT image FROM observation_images WHERE observation_id = ?");
@@ -142,7 +136,8 @@ function getImageFromDatabase($obsIndex) {
 
     return $stmt->fetchColumn();
 }
-function getObservationDetails($chantierId, $obsNumber) {
+function getObservationDetails($chantierId, $obsNumber)
+{
     global $pdo;
 
     $stmt = $pdo->prepare("SELECT * FROM observations WHERE chantier_id = ? AND observation_number = ?");
@@ -157,7 +152,8 @@ function getObservationDetails($chantierId, $obsNumber) {
     }
 }
 
-function getImagesForChantier($chantierId) {
+function getImagesForChantier($chantierId)
+{
     global $pdo;
 
     $obsStmt = $pdo->prepare("SELECT observation_id, observation_number FROM observations WHERE chantier_id = ?");
@@ -188,7 +184,8 @@ function getImagesForChantier($chantierId) {
 
     return $imagesByObservation;
 }
-function getObservationsForChantier($chantierId) {
+function getObservationsForChantier($chantierId)
+{
     global $pdo;
 
     $stmt = $pdo->prepare("SELECT * FROM observations WHERE chantier_id = ?");
@@ -199,7 +196,8 @@ function getObservationsForChantier($chantierId) {
     return $observations;
 }
 
-function getImagesForObservation($obsIndex) {
+function getImagesForObservation($obsIndex)
+{
     global $pdo;
 
     $stmt = $pdo->prepare("SELECT image FROM observation_images WHERE observation_id = ?");
@@ -221,7 +219,8 @@ function getImagesForObservation($obsIndex) {
 
     return $imagePaths;
 }
-function getNombreObservations($chantierId) {
+function getNombreObservations($chantierId)
+{
     global $pdo;
 
     try {
@@ -235,38 +234,55 @@ function getNombreObservations($chantierId) {
     }
 }
 
-function getLastObservationForChantier($chantierId) {
+function getLastObservationForChantier($chantierId)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM observations WHERE chantier_id = ? ORDER BY observation_number DESC LIMIT 1");
     $stmt->execute([$chantierId]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function getChantierDetails($chantierId) {
+function getChantierDetails($chantierId)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM chantiers WHERE id = ?");
     $stmt->execute([$chantierId]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function displayObservationImages($pdf, $imageFilePaths) {
+function displayObservationImages($pdf, $imageFilePaths)
+{
+    $x = 10;
+    $y = $pdf->GetY() + 2;
+    $maxHeight = 0;
+
     foreach ($imageFilePaths as $imageFilePath) {
         if (file_exists($imageFilePath)) {
             list($width, $height) = getimagesize($imageFilePath);
             $aspectRatio = $width / $height;
             $maxWidth = 180;
-            $maxHeight = 60;
+            $maxHeightImage = 60;
             $resizeWidth = $maxWidth;
             $resizeHeight = $resizeWidth / $aspectRatio;
-            if ($resizeHeight > $maxHeight) {
-                $resizeHeight = $maxHeight;
+            if ($resizeHeight > $maxHeightImage) {
+                $resizeHeight = $maxHeightImage;
                 $resizeWidth = $resizeHeight * $aspectRatio;
             }
-            $pdf->Ln(2);
-            $pdf->Image($imageFilePath, null, null, $resizeWidth, $resizeHeight);
-            unlink($imageFilePath); 
+
+            if ($x + $resizeWidth > ($pdf->GetPageWidth() - 10)) {
+                $x = 10;
+                $y += $maxHeight + 2;
+                $maxHeight = 0;
+            }
+
+            $pdf->Image($imageFilePath, $x, $y, $resizeWidth, $resizeHeight, '', '', '', false, 300, '', false, false, 0, false, false, false);
+            unlink($imageFilePath);
+
+            $x += $resizeWidth + 2;
+            $maxHeight = max($maxHeight, $resizeHeight);
         }
     }
+    $pdf->SetY($y + $maxHeight + 10);
 }
 class MYPDF extends TCPDF
 {
@@ -284,7 +300,8 @@ class MYPDF extends TCPDF
         $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }
-function generatePdf($postData, $chantierId) {
+function generatePdf($postData, $chantierId, $obsIndex)
+{   
     global $pdo;
     $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
     define('MARGIN_LEFT', 15);
@@ -298,10 +315,10 @@ function generatePdf($postData, $chantierId) {
     $pdf->SetAuthor('MONGARS Gaël');
     $pdf->SetTitle("Rapport de fiche d'observation ou de notification");
 
-    $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+    $pdf->SetMargins(MARGIN_LEFT, MARGIN_TOP, MARGIN_RIGHT);
+    $pdf->SetHeaderMargin(MARGIN_HEADER);
+    $pdf->SetFooterMargin(MARGIN_FOOTER);
+    $pdf->SetAutoPageBreak(TRUE, MARGIN_BOTTOM);
 
     $pdf->AddPage();
 
@@ -312,51 +329,85 @@ function generatePdf($postData, $chantierId) {
     $pdf->Cell(0, 0, 'Maître d\'Ouvrage : ' . clean_input($chantierDetails['maitreOuvrage']), 0, 1, 'L');
     $pdf->Cell(0, 0, 'Maître d\'Œuvre : ' . clean_input($chantierDetails['maitreOeuvre']), 0, 1, 'L');
     $pdf->Ln(5);
-    $pdf->MultiCell(0, 10, 'Personne(s) présente(s) :', 0, 'L');
-    $stmt = $pdo->prepare("SELECT nom FROM personnes_presentes WHERE chantier_id = ?");
-    $stmt->execute([$chantierId]);
+    $pdf->SetFont('helvetica', 'B', 10);
+    $label = 'Personne(s) présente(s) : ';
+    $labelWidth = $pdf->GetStringWidth($label) + 2;
+    $stmt = $pdo->prepare("SELECT nom FROM personnes_presentes WHERE observation_id = ?");
+    $stmt->execute([$obsIndex]);
     $personnesPresentes = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    foreach ($personnesPresentes as $nom) {
-        $pdf->Cell(0, 0, clean_input($nom), 0, 1, 'L');
+
+    $nomsPersonnesPresentes = implode(', ', array_map('clean_input', $personnesPresentes));
+
+    if (!empty($nomsPersonnesPresentes)) {
+        $pdf->Cell($labelWidth, 10, $label, 0, false);
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->Cell(0, 10, $nomsPersonnesPresentes, 0, 1,'L');
     }
+
     $pdf->Ln(5);
     $y = $pdf->GetY();
     $pdf->Line(10, $y, 200, $y);
     $pdf->Ln(2);
-    if (!empty($postData['coordonnateurSPS'])) {
-        $pdf->Cell(0, 0, 'Coordonnateur S.P.S.: ' . clean_input($postData['coordonnateurSPS']), 0, 1, '');
-    }
+    $texteSPS = "Gaël MONGARS";
+    $pdf->Cell(0, 0, 'Coordonnateur S.P.S.: ' . $texteSPS , 0, 1, '');
+    
+
     $y = $pdf->GetY();
     $pdf->Line(10, $y, 200, $y);
     $pdf->Ln(2);
 
     $lastObservation = getLastObservationForChantier($chantierId);
+
     if ($lastObservation) {
-        $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Cell(0, 10, 'Observation N°' . $lastObservation['observation_number'] . ':', 0, 1);
+
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->Cell(0, 10, 'Observation N°' . $lastObservation['observation_number'] . ':', 0, 1, 'L');
         $pdf->SetFont('helvetica', '', 10);
         $pdf->MultiCell(0, 10, clean_input($lastObservation['texte']), 0, 'L');
         displayObservationImages($pdf, getImagesForObservation($lastObservation['observation_id']));
-        $pdf->Cell(0, 0, 'Date: ' . $lastObservation['date'], 0, 1);
-        $pdf->Cell(0, 0, 'Heure: ' . $lastObservation['heure'], 0, 1);
-        $pdf->Cell(0, 0, 'Type de Visite: ' . $lastObservation['typeVisite'], 0, 1);
+        $pdf->Cell(0, 0, 'Date: ' . $lastObservation['date'], 0, 1, '');
+        $pdf->Cell(0, 0, 'Heure: ' . $lastObservation['heure'], 0, 1, '');
+        $pdf->Cell(0, 0, 'Type de Visite: ' . $lastObservation['typeVisite'], 0, 1, '');
+
         if (!empty($lastObservation['autreDescription'])) {
-            $pdf->Cell(0, 0, 'Description: ' . $lastObservation['autreDescription'], 0, 1);
+            $pdf->Cell(0, 0, 'Description: ' . $lastObservation['autreDescription'], 0, 1, '');
         }
-        $pdf->Cell(0, 0, 'Entreprise: ' . $lastObservation['entreprise'], 0, 1);
-        $pdf->Cell(0, 0, 'Effectif: ' . $lastObservation['effectif'], 0, 1);
-        
+
+        $pdf->Cell(0, 0, 'Entreprise: ' . $lastObservation['entreprise'], 0, 1, '');
+        $pdf->Cell(0, 0, 'Effectif: ' . $lastObservation['effectif'], 0, 1, '');
     }
-    
+    $pdf->Ln(10);
+
+    $pdf->Ln();
+    $texte = "Sans remarque de la part de l’entreprise dans un délai de 8 jours, les observations formulées par le Coordonnateur S.P.S. sont réputées acceptées sans réserve.";
+    $pdf->MultiCell(0, 10, $texte, 0, 'L');
+    $pdf->Ln(20);
+    $signatureImagePath = '../images/signature.png';
+    $imageWidth = 40;
+    $imageHeight = 20;
+    $offsetX = 0;
+    $pdf->Image($signatureImagePath, $pdf->GetX() - $offsetX, $pdf->GetY() - 10, $imageWidth, $imageHeight, 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
     $chantierName = preg_replace("/[^a-zA-Z0-9]/", "_", $chantierDetails['description']);
     $currentDate = date('Ymd');
-    $pdfFilename = "Rapport_{$chantierName}_{$currentDate}.pdf";
-    $pdf->Output(__DIR__ . "/../RenduPdf/" . $pdfFilename, 'F');
-
+    $pdfFilename = __DIR__ . "/../RenduPdf/{$chantierName}_{$currentDate}.pdf";
+    $pdf->Output($pdfFilename, 'F');
+    $pdf->SetPrintHeader(false);
+    $pdf->SetPrintFooter(false);
+    if (is_array($_FILES['photos1']['tmp_name'])) {
+        foreach ($_FILES['photos1']['tmp_name'] as $index => $tmpName) {
+            if (is_uploaded_file($tmpName)) {
+                $imagePath = $_FILES['photos1']['tmp_name'][$index];
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+        }
+    }
     return __DIR__ . "/../RenduPdf/" . $pdfFilename;
 }
 
 $chantierId = $_POST['chantier_id'] ?? 'DefaultChantierId';
-$pdfFilename = generatePdf($_POST, $chantierId);
+$pdfFilename = generatePdf($_POST, $chantierId, $obsIndex);
 echo "PDF généré: " . $pdfFilename;
-?>
+header("Location: ../mail/pageMail.php?file=" . urlencode($pdfFilename));
+die;

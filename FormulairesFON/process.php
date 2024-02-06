@@ -30,15 +30,8 @@ function saveFormData($pdo, $uploadedFiles)
     $stmt = $pdo->prepare("INSERT INTO chantiers (description, maitreOuvrage, maitreOeuvre, coordonnateurSPS) VALUES (?, ?, ?, ?)");
     $stmt->execute([$chantier, $maitreOuvrage, $maitreOeuvre, $coordonnateurSPS]);
     $chantierId = $pdo->lastInsertId();
-
-    if (isset($_POST['personne']) && is_array($_POST['personne'])) {
-        foreach ($_POST['personne'] as $personne) {
-            if (!empty($personne)) {
-                $stmt = $pdo->prepare("INSERT INTO personnes_presentes (chantier_id, nom) VALUES (?, ?)");
-                $stmt->execute([$chantierId, clean_input($personne)]);
-            }
-        }
-    }
+    $observationId = $pdo->lastInsertId();
+    $observationIds[] = $observationId;
 
     $obsIndex = 1;
     while (isset($_POST['observation' . $obsIndex])) {
@@ -54,6 +47,15 @@ function saveFormData($pdo, $uploadedFiles)
         $stmt->execute([$chantierId, $observation, $dateObservation, $heureObservation, $entreprise, $effectif, $obsIndex, $typeVisite, $autreDescription]);
         $observationId = $pdo->lastInsertId();
         $observationIds[] = $observationId;
+        if (isset($_POST['personne']) && !empty($_POST['personne'])) {
+            $personnes = explode("\n", str_replace("\r", "", $_POST['personne']));
+            foreach ($personnes as $personne) {
+                if (!empty($personne)) {
+                    $stmt = $pdo->prepare("INSERT INTO personnes_presentes (observation_id, nom) VALUES (?, ?)");
+                    $stmt->execute([$observationId, clean_input($personne)]);
+                }
+            }
+        }
 
         if (isset($_FILES['photos1']) && is_array($_FILES['photos1']['tmp_name'])) {
             foreach ($_FILES['photos1']['tmp_name'] as $tmpName) {
@@ -90,7 +92,7 @@ class MYPDF extends TCPDF
     }
 }
 
-function generatePdf($postData, $chantierId, $observationIds)
+function generatePdf($postData, $observationId, $observationIds)
 {
     global $pdo;
     $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -120,18 +122,18 @@ function generatePdf($postData, $chantierId, $observationIds)
     $pdf->Ln(5);
 
     $pdf->SetFont('helvetica', 'B', 10);
-    $stmt = $pdo->prepare("SELECT nom FROM personnes_presentes WHERE chantier_id = ?");
-    $stmt->execute([$chantierId]);
-    $personnesPresentes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($observationIds as $observationId) {
+        $stmt = $pdo->prepare("SELECT nom FROM personnes_presentes WHERE observation_id = ?");
+        $stmt->execute([$observationId]);
+        $personnesPresentes = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $nomsPersonnesPresentes = implode(', ', array_map('clean_input', $personnesPresentes));
+        $nomsPersonnesPresentes = implode(', ', array_map('clean_input', $personnesPresentes));
 
-    if (!empty($nomsPersonnesPresentes)) {
-        $intitule = 'Personne(s) présente(s) : ';
-        $pdf->SetFont('helvetica', 'B', 10);
-        $pdf->Cell(0, 10, $intitule . $nomsPersonnesPresentes, 0, 1, 'L');
-    } else {
-        $pdf->Cell(0, 10, 'Personne(s) présente(s) : Aucune', 0, 1, 'L');
+        if (!empty($nomsPersonnesPresentes)) {
+            $intitule = 'Personne(s) présente(s) : ';
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->Cell(0, 10, $intitule . $nomsPersonnesPresentes, 0, 1, 'L');
+        }
     }
     $pdf->Ln(5);
     $y = $pdf->GetY();
@@ -145,64 +147,62 @@ function generatePdf($postData, $chantierId, $observationIds)
     $y = $pdf->GetY();
     $pdf->Line(10, $y, 200, $y);
     $pdf->Ln(2);
+    $maxImageWidth = 100;
+    $maxImageHeight = 40;
+    $obsIndex = 1; 
+    $titreObservation = 'Observation '. $obsIndex . ': ';
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->Cell(0, 10, $titreObservation, 0, 1, 'L');
 
-    $obsNumber = 1;
-    foreach ($observationIds as $observationId) {
-        if ($pdf->GetY() + 120 > ($pdf->getPageHeight() - PDF_MARGIN_BOTTOM)) {
-            $pdf->AddPage();
-        }
-        $titreObservation = 'Observation ' . $obsNumber . ': ';
-        $pdf->SetFont('helvetica', 'B', 10);
-        $pdf->Cell(0, 10, $titreObservation, 0, 1, 'L');
+    $texteObservation = clean_input($postData["observation{$obsIndex}"]);
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->MultiCell(0, 10, $texteObservation, 0, 'L');
+    $pdf->Ln(5);
 
-        $texteObservation = clean_input($postData["observation{$obsNumber}"]);
-        $pdf->SetFont('helvetica', '', 10);
-        $pdf->MultiCell(0, 10, $texteObservation, 0, 'L');
-        $pdf->Ln(5);
-        $maxImageWidth = 100;
-        $maxImageHeight = 40;
-        $stmt = $pdo->prepare("SELECT image FROM observation_images WHERE observation_id = ?");
-        $stmt->execute([$observationId]);
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $imageContent = $row['image'];
-            $image = @imagecreatefromstring($imageContent);
-            if ($image !== false) {
-                $tempImagePath = tempnam(sys_get_temp_dir(), 'img');
-                imagepng($image, $tempImagePath);
-                list($width, $height) = getimagesize($tempImagePath);
-                $ratio = min($maxImageWidth / $width, $maxImageHeight / $height);
-                $newWidth = $width * $ratio;
-                $newHeight = $height * $ratio;
-                $pdf->Image($tempImagePath, '', '', $newWidth, $newHeight, 'PNG', '', 'T', false, 300, '', false, false, 1, false, false, false);
-                $pdf->Ln($newHeight + 5);
-                unlink($tempImagePath);
+    $stmt = $pdo->prepare("SELECT image FROM observation_images WHERE observation_id = ?");
+    $stmt->execute([$observationId]);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $imageContent = $row['image'];
+        $image = @imagecreatefromstring($imageContent);
+        if ($image !== false) {
+            $tempImagePath = tempnam(sys_get_temp_dir(), 'img');
+            imagepng($image, $tempImagePath);
+            list($width, $height) = getimagesize($tempImagePath);
+            $ratio = min($maxImageWidth / $width, $maxImageHeight / $height);
+            $newWidth = $width * $ratio;
+            $newHeight = $height * $ratio;
+
+            if ($pdf->GetY() + $newHeight > ($pdf->getPageHeight() - PDF_MARGIN_BOTTOM)) {
+                $pdf->AddPage();
             }
-        }
 
-        if (!empty($postData["date{$obsNumber}"])) {
-            $pdf->Cell(0, 0, 'Date : ' . clean_input($postData["date{$obsNumber}"]), 0, 1, '');
+            $pdf->Image($tempImagePath, '', '', $newWidth, $newHeight, 'PNG', '', 'T', false, 300, '', false, false, 1, false, false, false);
+            $pdf->Ln($newHeight + 5);
+            unlink($tempImagePath);
         }
-        if (!empty($postData["heure{$obsNumber}"])) {
-            $pdf->Cell(0, 0, 'Heure : ' . clean_input($postData["heure{$obsNumber}"]), 0, 1, '');
-        }
-        if (!empty($postData["typeVisite{$obsNumber}"])) {
-            $typeVisite = clean_input($postData["typeVisite{$obsNumber}"]);
-            $pdf->Cell(0, 0, 'Type de visite : ' . $typeVisite, 0, 1, '');
-        }
-        if ($postData["typeVisite{$obsNumber}"] === 'autre' && !empty($postData["autreDescription{$obsNumber}"])) {
-            $pdf->Cell(0, 0, 'Description : ' . clean_input($postData["autreDescription{$obsNumber}"]), 0, 1, '');
-        }
-        if (!empty($postData["entreprise{$obsNumber}"])) {
-            $pdf->Cell(0, 0, 'Entreprise : ' . clean_input($postData["entreprise{$obsNumber}"]), 0, 1, '');
-        }
-        if (!empty($postData["effectif{$obsNumber}"])) {
-            $pdf->Cell(0, 0, 'Effectif : ' . clean_input($postData["effectif{$obsNumber}"]), 0, 1, '');
-        }
-
-        $pdf->Ln(10);
-
-        $obsNumber++;
     }
+
+    if (!empty($postData["date{$obsIndex}"])) {
+        $pdf->Cell(0, 0, 'Date : ' . clean_input($postData["date{$obsIndex}"]), 0, 1, '');
+    }
+    if (!empty($postData["heure{$obsIndex}"])) {
+        $pdf->Cell(0, 0, 'Heure : ' . clean_input($postData["heure{$obsIndex}"]), 0, 1, '');
+    }
+    if (!empty($postData["typeVisite{$obsIndex}"])) {
+        $typeVisite = clean_input($postData["typeVisite{$obsIndex}"]);
+        $pdf->Cell(0, 0, 'Type de visite : ' . $typeVisite, 0, 1, '');
+    }
+    if ($postData["typeVisite{$obsIndex}"] === 'autre' && !empty($postData["autreDescription{$obsIndex}"])) {
+        $pdf->Cell(0, 0, 'Description : ' . clean_input($postData["autreDescription{$obsIndex}"]), 0, 1, '');
+    }
+    if (!empty($postData["entreprise{$obsIndex}"])) {
+        $pdf->Cell(0, 0, 'Entreprise : ' . clean_input($postData["entreprise{$obsIndex}"]), 0, 1, '');
+    }
+    if (!empty($postData["effectif{$obsIndex}"])) {
+        $pdf->Cell(0, 0, 'Effectif : ' . clean_input($postData["effectif{$obsIndex}"]), 0, 1, '');
+    }
+
+    $pdf->Ln(10);
 
     $pdf->Ln();
 
