@@ -94,7 +94,7 @@ $observationsIDs = $stmt->fetchAll();
         </div>
         <div class="input-group">
           <label for="coordonateursps">Coordonnateur S.P.S.:</label>
-          <input type="text" name="coordonnateurSPS" id="coordonnateurSPS" Value="Gaël MONGARS">
+          <input type="text" name="coordonnateurSPS" id="coordonnateurSPS" Value="">
         </div>
       </div>
       <div class="text-divider"></div>
