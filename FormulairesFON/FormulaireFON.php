@@ -24,7 +24,7 @@
         </div>
         <div class="input-group">
           <label for="coordonnateurSPS">Coordonnateur S.P.S.:</label>
-          <input type="text" name="coordonnateurSPS" id="coordonnateurSPS" Value="Gaël MONGARS">
+          <input type="text" name="coordonnateurSPS" id="coordonnateurSPS" Value="">
         </div>
       </div>
       <div class="text-divider"></div>
@@ -70,7 +70,7 @@
       <div class="part-three">
         <div class="column1">
           <label for="coordonnateurSPS_copy">Le Coordonnateur S.P.S :</label>
-          <input type="text" name="coordonnateurSPS_copy" id="coordonnateurSPS_copy" Value="Gaël MONGARS">
+          <input type="text" name="coordonnateurSPS_copy" id="coordonnateurSPS_copy" Value="">
           <label for="signature">Signature:</label>
           <img src="../images/signature.png" width="220" height="100">
         </div>
