@@ -488,7 +488,7 @@ if (!isset($_SESSION["username"])) {
                             <div class="formbold-mb-5">
                                 <br>coordonnateur S.P.S
                                 <br>
-                                Nom <input type="text" name="Nom2" id="Nom" value="MONGARS Gaël" /><br>
+                                Nom <input type="text" name="Nom2" id="Nom" value="" /><br>
                                 Date : <label for="Date" id="current_date3" />
                                 <script>
                                     date = new Date();
