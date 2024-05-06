@@ -28,10 +28,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         $mail->isSMTP();
-        $mail->Host       = 'smtp.office365.com';
+        $mail->Host       = '//ur SMTP Server';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'csps@eau17.fr';
-        $mail->Password   = '6jZAhEp9YrHkmURoR2g2';
+        $mail->Username   = '//ur SMTP User';
+        $mail->Password   = '//Password SMTP';
         $mail->SMTPSecure = 'tsl';
         $mail->Port       = 587;
 
@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <br><br> Cordialement,
 			<br>
 			  <img alt="PHPMailer" src="cid:my-attach">';
-        $mail->AddEmbeddedImage("signature-gael.png", "my-attach", "signature-gael.png");
+        $mail->AddEmbeddedImage("//ur sign", "my-attach", "signature-gael.png");
         $mail->send();
         echo 'Le mail a bien  été envoyé';
     } catch (Exception $e) {
