@@ -41,6 +41,3 @@ Ce guide est conçu pour vous aider à naviguer dans l'application Eau'Sec. L'ap
 
 ## 4. Envoi des Formulaires par E-mail
 - Une fois le PDF généré, entrez l'adresse e-mail du destinataire et cliquez sur "Envoyer" pour partager le formulaire directement depuis l'application.
-
-## 5. Support et Aide
-Si vous rencontrez des problèmes ou avez besoin d'assistance, veuillez contacter le support technique en ouvrant un ticket via [service-now](https://sde17.service-now.com/).
