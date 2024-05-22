@@ -23,11 +23,7 @@ if (!isset($_SESSION["username"])) {
 
 <body id="formVIC">
     <?php
-    try {
-        $bdd = new PDO('mysql:host=localhost;dbname=sps', 'root', '');
-    } catch (Exception $e) {
-        die('Erreur : ' . $e->getMessage());
-    }
+    include '../config.php';
     ?>
     <form method="POST" action="process.php">
         <div class="formbold-main-wrapper">
@@ -76,7 +72,7 @@ if (!isset($_SESSION["username"])) {
                     <label for="Lot concerné " class="formbold-form-label">Lot concerné :</label>
                     <select id="Lot concerné" name="Lot concerné[]" class="formbold-form-input" multiple multiselect-select-all="true">
                         <?php
-                        $reponse = $bdd->query('SELECT * FROM lot ORDER BY Nom');
+                        $reponse = $pdo->query('SELECT * FROM lot ORDER BY Nom');
                         while ($donnees = $reponse->fetch()) {
                         ?>
                             <option value="<?php echo $donnees['Nom']; ?>"> <?php echo $donnees['Nom']; ?></option>
@@ -97,7 +93,7 @@ if (!isset($_SESSION["username"])) {
                     <select id="Sous-Traitant de" name="Sous-Traitant de[]" class="formbold-form-input">
                         <option value="">Sélectionnez une entreprise</option>
                         <?php
-                        $reponse = $bdd->query('SELECT * FROM entreprise ORDER BY Nom');
+                        $reponse = $pdo->query('SELECT * FROM entreprise ORDER BY Nom');
                         while ($donnees = $reponse->fetch()) {
                         ?>
                             <option value="<?php echo $donnees['Nom']; ?>"> <?php echo $donnees['Nom']; ?></option>
@@ -185,7 +181,7 @@ if (!isset($_SESSION["username"])) {
                         <label for="Zones d’installation de chantier" class="formbold-form-label">Zones d’installation de chantier :</label>
                         <select id="Zones d’installation de chantier " name="Zones d’installation de chantier[]" class="formbold-form-input" multiple multiselect-select-all="true">
                             <?php
-                            $reponse = $bdd->query('SELECT * FROM zidc ORDER BY Nom');
+                            $reponse = $pdo->query('SELECT * FROM zidc ORDER BY Nom');
                             while ($donnees = $reponse->fetch()) {
                             ?>
                                 <option value="<?php echo $donnees['Nom']; ?>"> <?php echo $donnees['Nom']; ?></option>
@@ -257,7 +253,7 @@ if (!isset($_SESSION["username"])) {
                         <label for="Signalisation travaux" class="formbold-form-label"> Signalisation travaux:</label>
                         <select class="formbold-form-input" id="Signalisation travaux" name="Signalisation travaux[]" multiple multiselect-select-all="true">
                             <?php
-                            $reponse = $bdd->query('SELECT * FROM signalisation ORDER BY Nom');
+                            $reponse = $pdo->query('SELECT * FROM signalisation ORDER BY Nom');
                             while ($donnees = $reponse->fetch()) {
                             ?>
                                 <option value="<?php echo $donnees['Nom']; ?>"> <?php echo $donnees['Nom']; ?></option>
@@ -395,7 +391,7 @@ if (!isset($_SESSION["username"])) {
                             <label for="enterres" class="formbold-form-label">Réseaux Entérrées</label>
                             <select id="enterres" name="enterres[]" class="formbold-form-input" multiple multiselect-select-all="true">
                                 <?php
-                                $reponse = $bdd->query('SELECT * FROM reseauxenterres ORDER BY nom');
+                                $reponse = $pdo->query('SELECT * FROM reseauxenterres ORDER BY nom');
                                 while ($donnees = $reponse->fetch()) {
                                 ?>
                                     <option value="<?php echo $donnees['nom']; ?>"> <?php echo $donnees['nom']; ?></option>
@@ -410,7 +406,7 @@ if (!isset($_SESSION["username"])) {
                             <label for="enterres" class="formbold-form-label">Réseaux Aériens</label>
                             <select id="Aeriens" name="Aeriens[]" class="formbold-form-input" multiple multiselect-select-all="true">
                                 <?php
-                                $reponse = $bdd->query('SELECT * FROM reseauxaeriens ORDER BY nom');
+                                $reponse = $pdo->query('SELECT * FROM reseauxaeriens ORDER BY nom');
                                 while ($donnees = $reponse->fetch()) {
                                 ?>
                                     <option value="<?php echo $donnees['nom']; ?>"> <?php echo $donnees['nom']; ?></option>
@@ -437,7 +433,7 @@ if (!isset($_SESSION["username"])) {
                     <label for="ISDD" class="formbold-form-label">Interventions susceptibles d’être dangereuses :</label>
                     <select id="ISDD" name="Interventions susceptibles d’être dangereuses[]" class="formbold-form-input" multiple multiselect-select-all="true">
                         <?php
-                        $reponse = $bdd->query('SELECT * FROM interventions ORDER BY Nom');
+                        $reponse = $pdo->query('SELECT * FROM interventions ORDER BY Nom');
                         while ($donnees = $reponse->fetch()) {
                         ?>
                             <option value="<?php echo $donnees['Nom']; ?>"> <?php echo $donnees['Nom']; ?></option>
@@ -454,7 +450,7 @@ if (!isset($_SESSION["username"])) {
                     <label for="PAI" class="formbold-form-label">Protections à installer :</label>
                     <select id="PAI" name="Protections à installer[]" class="formbold-form-input" multiple multiselect-select-all="true">
                         <?php
-                        $reponse = $bdd->query('SELECT * FROM protections ORDER BY Nom');
+                        $reponse = $pdo->query('SELECT * FROM protections ORDER BY Nom');
                         while ($donnees = $reponse->fetch()) {
                         ?>
                             <option value="<?php echo $donnees['Nom']; ?>"> <?php echo $donnees['Nom']; ?></option>
